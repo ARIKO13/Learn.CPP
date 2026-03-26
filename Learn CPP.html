@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CodeCraft C++ — Platform belajar C++ interaktif dengan materi lengkap, kuis gamifikasi, editor kode, dan analisis AI. Belajar C++ dari nol sampai mahir!">
+<title>CodeCraft C++ — Belajar C++ Interaktif</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RESET & TOKENS
+============================================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  /* palette */
+  --bg:       #07090f;
+  --bg2:      #0d1117;
+  --bg3:      #161b25;
+  --bg4:      #1e2535;
+  --bg5:      #252d40;
+  --accent:   #4af4c0;
+  --accent2:  #ff5f5f;
+  --accent3:  #bf94ff;
+  --blue:     #5ba4ff;
+  --gold:     #ffc857;
+  --green:    #3ddc84;
+  --red:      #ff5555;
+  --orange:   #ff9640;
+  --text:     #e8edf5;
+  --text2:    #8b9ab5;
+  --text3:    #4a5568;
+  --border:   #1e2535;
+  --border2:  #2a3347;
+  --font:     'Outfit', sans-serif;
+  --mono:     'JetBrains Mono', monospace;
+  --display:  'Syne', sans-serif;
+  --hdr:      56px;
+  --radius:   12px;
+  --shadow:   0 4px 24px rgba(0,0,0,.5);
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+
+/* ============================================================
+   SCROLLBAR
+============================================================ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ============================================================
+   WELCOME OVERLAY
+============================================================ */
+#welcome-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  animation: fadeOutOverlay 0.5s ease 3.5s forwards;
+}
+@keyframes fadeOutOverlay {
+  to { opacity: 0; pointer-events: none; }
+}
+.wo-logo {
+  font-family: var(--display); font-size: 52px; font-weight: 800;
+  color: var(--accent); letter-spacing: -2px;
+  animation: logoReveal 0.8s cubic-bezier(.34,1.56,.64,1) 0.3s both;
+}
+@keyframes logoReveal {
+  from { opacity: 0; transform: translateY(30px) scale(.9); }
+  to { opacity: 1; transform: none; }
+}
+.wo-sub {
+  font-size: 15px; color: var(--text2); margin-top: 10px;
+  animation: logoReveal 0.8s ease 0.8s both;
+}
+.wo-bar-wrap {
+  width: 200px; height: 3px; background: var(--bg3); border-radius: 99px; margin-top: 36px;
+  overflow: hidden;
+  animation: logoReveal 0.3s ease 1.2s both;
+}
+.wo-bar {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent3));
+  border-radius: 99px; width: 0;
+  animation: barFill 2s ease 1.4s forwards;
+}
+@keyframes barFill { to { width: 100%; } }
+.wo-tip {
+  font-size: 13px; color: var(--text3); margin-top: 16px;
+  animation: logoReveal 0.5s ease 1.5s both;
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+#header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: rgba(7,9,15,.92); backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; height: var(--hdr);
+  gap: 12px;
+}
+.logo {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  font-family: var(--display); font-size: 18px; font-weight: 800;
+  color: var(--text); letter-spacing: -0.5px;
+}
+.logo-badge {
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 10px; font-weight: 800; color: #000;
+}
+.logo-accent { color: var(--accent); }
+
+/* NAV */
+.nav-tabs { display: flex; gap: 3px; background: var(--bg3); border-radius: 10px; padding: 4px; }
+.nav-tab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: none; background: transparent; color: var(--text2);
+  transition: all .2s; white-space: nowrap;
+}
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { background: var(--accent); color: #000; font-weight: 700; }
+.nav-tab .tab-icon { font-size: 14px; }
+
+/* STATS */
+.hdr-stats { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.stat-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 5px 10px; font-size: 12px; font-weight: 700;
+  font-family: var(--mono); transition: all .2s;
+}
+.stat-chip:hover { border-color: var(--border2); transform: translateY(-1px); }
+.stat-chip.xp { color: var(--gold); }
+.stat-chip.streak { color: var(--orange); }
+.stat-chip.hp { color: var(--red); }
+
+/* progress bar header */
+.hdr-progress {
+  position: fixed; top: var(--hdr); left: 0; right: 0; z-index: 999;
+  height: 3px; background: var(--bg3);
+}
+.hdr-progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent3));
+  transition: width .5s ease; width: 0%;
+}
+
+/* ============================================================
+   SCREENS
+============================================================ */
+.screen {
+  display: none; position: fixed;
+  top: calc(var(--hdr) + 3px); left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+}
+.screen.active { display: flex; flex-direction: column; }
+
+/* ============================================================
+   MATERI SCREEN
+============================================================ */
+#screen-home { flex-direction: row !important; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px; flex-shrink: 0;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  overflow-y: auto; display: flex; flex-direction: column;
+}
+.sidebar-header {
+  padding: 16px 16px 8px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; color: var(--text3);
+  border-bottom: 1px solid var(--border);
+}
+.progress-ring-wrap {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.prog-label { font-size: 12px; color: var(--text2); }
+.prog-count { font-size: 18px; font-weight: 700; font-family: var(--mono); color: var(--accent); }
+.prog-bar-mini { flex: 1; height: 4px; background: var(--bg4); border-radius: 99px; overflow: hidden; }
+.prog-bar-mini-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent3)); border-radius: 99px; transition: width .4s; }
+
+.sidebar-section-title {
+  font-size: 9px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 2.5px; color: var(--text3);
+  padding: 14px 16px 5px;
+}
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px; cursor: pointer;
+  font-size: 13px; font-weight: 500; color: var(--text2);
+  transition: all .15s; border-left: 2px solid transparent;
+  position: relative;
+}
+.sidebar-item:hover { background: var(--bg3); color: var(--text); border-left-color: var(--border2); }
+.sidebar-item.active { background: rgba(74,244,192,.07); color: var(--accent); border-left-color: var(--accent); }
+.sidebar-item.done { color: var(--green); }
+.si-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.si-done { margin-left: auto; font-size: 11px; background: var(--green); color: #000; width: 16px; height: 16px; border-radius: 99px; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
+
+/* MATERI CONTENT */
+.materi-scroll { flex: 1; overflow-y: auto; }
+.materi-inner { padding: 32px 44px; max-width: 820px; }
+
+.materi-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(74,244,192,.1); border: 1px solid rgba(74,244,192,.25);
+  border-radius: 20px; padding: 3px 12px; font-size: 10px; font-weight: 800;
+  color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+.materi-title { font-family: var(--display); font-size: 34px; font-weight: 800; line-height: 1.15; margin-bottom: 10px; }
+.materi-desc { font-size: 15px; color: var(--text2); line-height: 1.7; }
+.materi-divider { height: 1px; background: linear-gradient(90deg, var(--border2) 0%, transparent 70%); margin: 28px 0; }
+
+/* CONTENT BODY */
+.content-body h2 { font-family: var(--display); font-size: 20px; font-weight: 700; margin: 30px 0 12px; }
+.content-body h3 { font-size: 15px; font-weight: 700; margin: 20px 0 8px; color: var(--accent); }
+.content-body p { font-size: 14px; line-height: 1.85; color: var(--text2); margin-bottom: 14px; }
+.content-body ul, .content-body ol { padding-left: 20px; margin-bottom: 14px; }
+.content-body li { font-size: 14px; line-height: 1.85; color: var(--text2); margin-bottom: 5px; }
+.content-body strong { color: var(--text); font-weight: 700; }
+.content-body code { font-family: var(--mono); font-size: 12px; background: var(--bg4); padding: 1px 6px; border-radius: 4px; color: var(--accent); }
+
+/* INFO BOXES */
+.info-box {
+  border-radius: var(--radius); padding: 14px 16px; margin: 16px 0;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.info-box.tip { background: rgba(61,220,132,.06); border: 1px solid rgba(61,220,132,.2); }
+.info-box.warn { background: rgba(255,150,64,.06); border: 1px solid rgba(255,150,64,.2); }
+.info-box.danger { background: rgba(255,85,85,.06); border: 1px solid rgba(255,85,85,.2); }
+.info-box.note { background: rgba(74,244,192,.05); border: 1px solid rgba(74,244,192,.15); }
+.ib-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.ib-text { font-size: 13px; line-height: 1.7; color: var(--text2); }
+.ib-text strong { color: var(--text); }
+
+/* CODE BLOCKS */
+.code-block { background: var(--bg); border: 1px solid var(--border2); border-radius: var(--radius); overflow: hidden; margin: 16px 0; }
+.cb-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+.cb-dots { display: flex; gap: 5px; }
+.cb-dots span { width: 8px; height: 8px; border-radius: 50%; }
+.cb-dots span:nth-child(1) { background: #ff5f57; }
+.cb-dots span:nth-child(2) { background: #febc2e; }
+.cb-dots span:nth-child(3) { background: #28c840; }
+.cb-filename { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.cb-copy {
+  background: var(--bg4); border: 1px solid var(--border2); border-radius: 5px;
+  padding: 3px 10px; font-size: 11px; font-weight: 600; color: var(--text2);
+  cursor: pointer; transition: all .15s; font-family: var(--font);
+}
+.cb-copy:hover { color: var(--accent); border-color: var(--accent); }
+.cb-body {
+  padding: 14px 16px; font-family: var(--mono); font-size: 12.5px; line-height: 1.75;
+  overflow-x: auto; white-space: pre;
+}
+/* syntax colors */
+.kw { color: #ff79c6; } .fn { color: #50fa7b; } .str { color: #f1fa8c; }
+.num { color: #bd93f9; } .com { color: #585e72; font-style: italic; } .ty { color: #8be9fd; }
+.pp { color: #ff5f5f; }
+
+/* QUIZ CTA */
+.materi-quiz-cta {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, rgba(191,148,255,.12), rgba(74,244,192,.08));
+  border: 1px solid rgba(191,148,255,.25); border-radius: 14px;
+  padding: 18px 22px; cursor: pointer; transition: all .2s; margin-top: 36px;
+}
+.materi-quiz-cta:hover { border-color: var(--accent3); box-shadow: 0 0 30px rgba(191,148,255,.15); transform: translateY(-2px); }
+.mqc-left { display: flex; align-items: center; gap: 14px; }
+.mqc-icon { font-size: 30px; }
+.mqc-title { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+.mqc-sub { font-size: 12px; color: var(--text2); }
+.mqc-arrow { font-size: 20px; color: var(--accent3); }
+
+/* ============================================================
+   QUIZ SCREEN
+============================================================ */
+#screen-quiz { overflow-y: auto; }
+.quiz-inner { max-width: 700px; margin: 0 auto; padding: 28px 20px; width: 100%; }
+
+/* Chapter selector */
+.quiz-selector-header { margin-bottom: 28px; }
+.qs-title { font-family: var(--display); font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+.qs-sub { font-size: 14px; color: var(--text2); }
+.quiz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.quiz-card {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 14px; padding: 18px 16px; cursor: pointer;
+  transition: all .2s; position: relative; overflow: hidden;
+}
+.quiz-card::before {
+  content: ''; position: absolute; inset: 0; opacity: 0;
+  transition: opacity .2s;
+  background: linear-gradient(135deg, rgba(74,244,192,.06), transparent);
+}
+.quiz-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.quiz-card:hover::before { opacity: 1; }
+.quiz-card.completed { border-color: var(--green); }
+.qc-icon { font-size: 26px; margin-bottom: 10px; }
+.qc-title { font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+.qc-meta { display: flex; align-items: center; justify-content: space-between; }
+.qc-count { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.qc-done { font-size: 11px; font-weight: 700; color: var(--green); }
+
+/* Quiz game */
+.quiz-back {
+  display: inline-flex; align-items: center; gap: 7px;
+  color: var(--text2); font-size: 12px; font-weight: 600; cursor: pointer;
+  background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px;
+  padding: 6px 12px; transition: all .15s; margin-bottom: 20px;
+}
+.quiz-back:hover { color: var(--text); }
+
+.quiz-prog-wrap { margin-bottom: 22px; }
+.quiz-prog-meta { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 7px; }
+.quiz-prog-bar { height: 6px; background: var(--bg3); border-radius: 99px; overflow: hidden; }
+.quiz-prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent3), var(--accent)); border-radius: 99px; transition: width .5s cubic-bezier(.34,1.56,.64,1); }
+
+.q-card {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 16px; padding: 24px; margin-bottom: 14px;
+  animation: slideUp .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+.q-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.q-type-tag {
+  background: rgba(191,148,255,.15); border: 1px solid rgba(191,148,255,.25);
+  border-radius: 5px; padding: 2px 9px; font-size: 10px; font-weight: 800;
+  color: var(--accent3); text-transform: uppercase; letter-spacing: 1px;
+}
+.q-num { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.q-text { font-size: 16px; font-weight: 600; line-height: 1.55; margin-bottom: 16px; }
+.q-code {
+  background: var(--bg); border: 1px solid var(--border2); border-radius: 9px;
+  padding: 12px 14px; font-family: var(--mono); font-size: 12px; line-height: 1.7;
+  margin-bottom: 16px; overflow-x: auto; white-space: pre;
+  border-left: 3px solid var(--accent3);
+}
+
+.opts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.opts-grid.solo { grid-template-columns: 1fr; }
+.opt-btn {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: var(--bg3); border: 2px solid var(--border2);
+  border-radius: 10px; padding: 12px 14px; cursor: pointer;
+  font-family: var(--font); font-size: 13px; font-weight: 500;
+  color: var(--text); text-align: left; transition: all .15s;
+}
+.opt-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(74,244,192,.05); }
+.opt-btn.selected { border-color: var(--accent3); background: rgba(191,148,255,.08); }
+.opt-btn.correct { border-color: var(--green) !important; background: rgba(61,220,132,.07) !important; animation: pulse .4s; }
+.opt-btn.wrong { border-color: var(--red) !important; background: rgba(255,85,85,.07) !important; animation: shake .4s; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.02)} }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+.opt-letter {
+  width: 24px; height: 24px; border-radius: 6px; background: var(--bg);
+  border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; flex-shrink: 0; font-family: var(--mono);
+}
+.opt-btn.correct .opt-letter { background: var(--green); border-color: var(--green); color: #000; }
+.opt-btn.wrong .opt-letter { background: var(--red); border-color: var(--red); color: #fff; }
+.opt-txt { font-family: var(--mono); font-size: 12px; line-height: 1.5; }
+
+/* FEEDBACK */
+.fb-card { border-radius: 13px; padding: 18px; margin-bottom: 14px; animation: slideUp .3s ease; }
+.fb-card.ok { background: rgba(61,220,132,.06); border: 1.5px solid rgba(61,220,132,.25); }
+.fb-card.err { background: rgba(255,85,85,.06); border: 1.5px solid rgba(255,85,85,.25); }
+.fb-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.fb-emoji { font-size: 22px; animation: bounceIn .4s cubic-bezier(.34,1.56,.64,1); }
+@keyframes bounceIn { from{transform:scale(0)} to{transform:scale(1)} }
+.fb-title { font-size: 15px; font-weight: 700; }
+.fb-card.ok .fb-title { color: var(--green); }
+.fb-card.err .fb-title { color: var(--red); }
+.fb-exp { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 12px; }
+.fb-link { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--accent); cursor: pointer; }
+.fb-link:hover { text-decoration: underline; }
+
+/* MINI DEMO */
+.mini-demo { background: var(--bg); border: 1px solid var(--border2); border-radius: 9px; overflow: hidden; margin-top: 10px; }
+.mini-demo-header { display: flex; align-items: center; justify-content: space-between; padding: 7px 11px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+.mini-run-btn {
+  display: flex; align-items: center; gap: 4px;
+  background: var(--green); color: #000; border: none; border-radius: 5px;
+  padding: 3px 9px; font-size: 11px; font-weight: 800; cursor: pointer;
+  font-family: var(--font); transition: all .12s;
+}
+.mini-run-btn:hover { filter: brightness(1.1); }
+.mini-run-btn:disabled { background: var(--bg4); color: var(--text3); cursor: default; }
+.mini-code { padding: 10px 13px; font-family: var(--mono); font-size: 11px; line-height: 1.7; white-space: pre; overflow-x: auto; color: var(--text2); }
+.mini-output { padding: 8px 13px; font-family: var(--mono); font-size: 11.5px; color: var(--green); min-height: 28px; white-space: pre-wrap; border-top: 1px solid var(--border); }
+.mini-output.is-err { color: var(--red); }
+.out-label { font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text3); display: block; margin-bottom: 2px; }
+.cursor { display: inline-block; width: 5px; height: 11px; background: var(--green); animation: blink 1s infinite; vertical-align: text-bottom; }
+@keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+/* BUTTONS */
+.cta-check {
+  width: 100%; padding: 13px; border-radius: 10px; font-family: var(--font);
+  font-size: 14px; font-weight: 700; border: none; cursor: pointer;
+  background: var(--accent); color: #000; letter-spacing: .5px; transition: all .15s;
+}
+.cta-check:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(74,244,192,.35); }
+.cta-check:disabled { background: var(--bg4); color: var(--text3); cursor: default; transform: none; box-shadow: none; }
+.cta-next {
+  width: 100%; padding: 13px; border-radius: 10px; font-family: var(--font);
+  font-size: 14px; font-weight: 700; border: none; cursor: pointer;
+  background: var(--accent3); color: #000; letter-spacing: .5px; transition: all .15s;
+}
+.cta-next:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(191,148,255,.4); }
+
+/* COMPLETE */
+.complete-wrap { text-align: center; padding: 44px 20px; animation: slideUp .5s ease; }
+.trophy-big { font-size: 72px; display: block; margin-bottom: 14px; animation: bounceIn .6s cubic-bezier(.34,1.56,.64,1); }
+.comp-title { font-family: var(--display); font-size: 34px; font-weight: 800; color: var(--gold); margin-bottom: 5px; }
+.comp-sub { font-size: 14px; color: var(--text2); margin-bottom: 28px; }
+.comp-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; max-width: 380px; margin: 0 auto 24px; }
+.cs { background: var(--bg3); border: 1px solid var(--border2); border-radius: 12px; padding: 16px 10px; }
+.cs-val { font-size: 26px; font-weight: 800; font-family: var(--mono); margin-bottom: 3px; }
+.cs-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); }
+.comp-actions { display: flex; gap: 9px; justify-content: center; flex-wrap: wrap; }
+.comp-btn { padding: 11px 22px; border-radius: 9px; font-family: var(--font); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: all .15s; }
+.comp-btn.retry { background: var(--gold); color: #000; }
+.comp-btn.back { background: var(--bg3); color: var(--text); border: 1px solid var(--border2); }
+.comp-btn.back:hover { border-color: var(--text3); }
+.comp-btn.nxt { background: var(--accent3); color: #000; }
+.comp-btn:hover { transform: translateY(-2px); }
+
+/* ============================================================
+   EDITOR SCREEN
+============================================================ */
+#screen-editor { flex-direction: row !important; }
+
+.editor-sidebar {
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; width: 290px; flex-shrink: 0;
+}
+.es-header {
+  padding: 13px 14px; border-bottom: 1px solid var(--border);
+  font-size: 12px; font-weight: 700; color: var(--text2); flex-shrink: 0;
+  display: flex; align-items: center; gap: 7px;
+}
+.es-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.es-tab { flex: 1; padding: 9px; text-align: center; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--text3); transition: all .15s; border: none; background: none; }
+.es-tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+.es-challenges { overflow-y: auto; flex: 1; }
+
+/* Challenge items */
+.ch-group-title { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--text3); padding: 10px 14px 4px; }
+.challenge-item { padding: 11px 14px; cursor: pointer; border-bottom: 1px solid var(--border); transition: all .15s; border-left: 2px solid transparent; }
+.challenge-item:hover { background: var(--bg3); }
+.challenge-item.active { background: rgba(74,244,192,.06); border-left-color: var(--accent); }
+.ch-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
+.ch-done-icon { color: var(--green); font-size: 12px; }
+.ch-meta { display: flex; align-items: center; gap: 7px; }
+.ch-diff { font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: .5px; }
+.ch-diff.easy { background: rgba(61,220,132,.15); color: var(--green); }
+.ch-diff.medium { background: rgba(255,150,64,.15); color: var(--orange); }
+.ch-diff.hard { background: rgba(255,85,85,.15); color: var(--red); }
+.ch-topic { font-size: 11px; color: var(--text3); }
+
+/* Editor main */
+.editor-main { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+.editor-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 14px; background: var(--bg2); border-bottom: 1px solid var(--border);
+  flex-shrink: 0; gap: 10px;
+}
+.editor-title { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.editor-actions { display: flex; gap: 7px; align-items: center; flex-shrink: 0; }
+.ea-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: 7px; font-family: var(--font);
+  font-size: 12px; font-weight: 700; cursor: pointer; border: none; transition: all .15s;
+}
+.ea-btn.run { background: var(--green); color: #000; }
+.ea-btn.run:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.ea-btn.reset { background: var(--bg4); color: var(--text2); border: 1px solid var(--border2); }
+.ea-btn.reset:hover { color: var(--text); }
+.ea-btn.hint { background: rgba(255,200,87,.12); color: var(--gold); border: 1px solid rgba(255,200,87,.2); }
+.ea-btn.hint:hover { background: rgba(255,200,87,.2); }
+.ea-btn.save { background: rgba(74,244,192,.12); color: var(--accent); border: 1px solid rgba(74,244,192,.2); }
+.ea-btn.save:hover { background: rgba(74,244,192,.2); }
+
+.editor-layout { display: flex; flex: 1; overflow: hidden; }
+.editor-left { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.editor-right { width: 320px; border-left: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; }
+
+/* Code area */
+.code-editor-wrap { flex: 1; position: relative; overflow: hidden; background: var(--bg); }
+.line-nums {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 40px;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  font-family: var(--mono); font-size: 12px; line-height: 1.6;
+  color: var(--text3); padding: 14px 0; overflow: hidden;
+  pointer-events: none; text-align: right;
+}
+.line-nums span { display: block; padding: 0 8px; font-size: 11px; }
+#code-textarea {
+  position: absolute; left: 40px; top: 0; right: 0; bottom: 0;
+  background: transparent; border: none; outline: none; resize: none;
+  font-family: var(--mono); font-size: 13px; line-height: 1.6;
+  color: var(--text); padding: 14px 14px 14px 10px; tab-size: 4;
+  caret-color: var(--accent);
+}
+.unsaved-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--orange); display: none; flex-shrink: 0; }
+
+/* Output */
+.output-panel { height: 190px; border-top: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+.output-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 12px; background: var(--bg2); border-bottom: 1px solid var(--border);
+  font-size: 11px; font-weight: 700; color: var(--text2); flex-shrink: 0;
+}
+.output-status { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; }
+.output-status.ok { background: rgba(61,220,132,.15); color: var(--green); }
+.output-status.err { background: rgba(255,85,85,.15); color: var(--red); }
+.output-status.idle { background: var(--bg4); color: var(--text3); }
+#output-text { flex: 1; padding: 10px 13px; font-family: var(--mono); font-size: 12px; line-height: 1.75; overflow-y: auto; white-space: pre-wrap; color: var(--green); }
+#output-text.has-error { color: var(--red); }
+
+/* Right panel */
+.rp-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.rp-tab { flex: 1; padding: 9px; text-align: center; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text3); transition: all .15s; background: none; border: none; }
+.rp-tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+.rp-content { flex: 1; overflow-y: auto; padding: 14px; }
+
+.problem-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; font-family: var(--display); }
+.problem-desc { font-size: 12.5px; line-height: 1.8; color: var(--text2); margin-bottom: 13px; }
+.problem-example { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 12px; font-family: var(--mono); font-size: 11px; line-height: 1.65; margin-bottom: 10px; }
+.pe-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); margin-bottom: 5px; }
+
+/* AI panel */
+.ai-idle { text-align: center; padding: 28px 12px; color: var(--text3); font-size: 13px; line-height: 1.7; }
+.ai-idle-icon { font-size: 36px; display: block; margin-bottom: 9px; opacity: .4; }
+.ai-loading { padding: 14px 0; }
+.ai-typing { display: flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 9px; padding: 11px 13px; font-size: 12px; color: var(--text2); }
+.typing-dots { display: flex; gap: 4px; }
+.typing-dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: typingDot 1.2s infinite; }
+.typing-dots span:nth-child(2) { animation-delay: .2s; }
+.typing-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes typingDot { 0%,100%{opacity:.3;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
+
+.ai-error-card { background: rgba(255,85,85,.06); border: 1px solid rgba(255,85,85,.2); border-radius: 9px; padding: 12px; margin-bottom: 9px; }
+.ai-error-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; color: var(--red); margin-bottom: 6px; }
+.ai-error-msg { font-family: var(--mono); font-size: 10.5px; color: var(--red); background: rgba(255,85,85,.07); border-radius: 5px; padding: 7px 9px; margin-bottom: 7px; white-space: pre-wrap; }
+.ai-explain { font-size: 12.5px; line-height: 1.7; color: var(--text2); }
+.ai-fix-card { background: rgba(61,220,132,.05); border: 1px solid rgba(61,220,132,.18); border-radius: 9px; padding: 12px; margin-bottom: 9px; }
+.ai-fix-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; color: var(--green); margin-bottom: 6px; }
+.ai-fix-code { font-family: var(--mono); font-size: 11px; color: var(--green); background: rgba(61,220,132,.05); border-radius: 5px; padding: 7px 9px; white-space: pre-wrap; }
+.ai-materi-link { background: rgba(74,244,192,.05); border: 1px solid rgba(74,244,192,.15); border-radius: 9px; padding: 11px 12px; }
+.aml-title { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 7px; }
+.aml-topics { display: flex; flex-wrap: wrap; gap: 5px; }
+.aml-chip { background: rgba(74,244,192,.08); border: 1px solid rgba(74,244,192,.2); border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 700; color: var(--accent); cursor: pointer; transition: all .15s; }
+.aml-chip:hover { background: rgba(74,244,192,.18); }
+.ai-success { background: rgba(61,220,132,.06); border: 1px solid rgba(61,220,132,.22); border-radius: 11px; padding: 14px; text-align: center; }
+.ai-success-icon { font-size: 32px; display: block; margin-bottom: 7px; }
+.ai-success-title { font-size: 14px; font-weight: 700; color: var(--green); margin-bottom: 3px; }
+.ai-success-sub { font-size: 11.5px; color: var(--text2); }
+
+/* ============================================================
+   TOAST / XP POPUP
+============================================================ */
+.xp-toast {
+  position: fixed; top: 68px; left: 50%; transform: translateX(-50%);
+  background: var(--gold); color: #000; font-weight: 800; font-size: 14px;
+  padding: 7px 18px; border-radius: 99px; z-index: 9999; pointer-events: none;
+  display: none; animation: xpPop 1.6s forwards;
+}
+@keyframes xpPop {
+  0%{opacity:0;transform:translateX(-50%) scale(.7)}
+  20%{opacity:1;transform:translateX(-50%) scale(1.08)}
+  70%{opacity:1;transform:translateX(-50%) translateY(-5px) scale(1)}
+  100%{opacity:0;transform:translateX(-50%) translateY(-20px) scale(.9)}
+}
+
+/* Save toast */
+.save-toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--bg3); border: 1px solid var(--green);
+  color: var(--green); font-weight: 700; font-size: 13px;
+  padding: 10px 18px; border-radius: 10px; z-index: 9999; pointer-events: none;
+  display: none; animation: saveToast .3s ease;
+}
+@keyframes saveToast { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+
+/* CONFETTI */
+.conf-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 9998; }
+.conf-p { position: absolute; top: -20px; border-radius: 2px; animation: confFall linear forwards; }
+@keyframes confFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+
+/* ============================================================
+   TOOLTIP — HP info
+============================================================ */
+.tip-wrap { position: relative; }
+.tip-wrap:hover .tooltip { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.tooltip {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 9px; padding: 10px 14px; font-size: 12px; color: var(--text2);
+  white-space: nowrap; opacity: 0; pointer-events: none;
+  transform: translateY(-5px); transition: all .2s; z-index: 500;
+  line-height: 1.6; min-width: 200px; box-shadow: var(--shadow);
+}
+.tooltip::before {
+  content: ''; position: absolute; top: -5px; right: 14px;
+  width: 9px; height: 9px; background: var(--bg3);
+  border-top: 1px solid var(--border2); border-right: 1px solid var(--border2);
+  transform: rotate(-45deg);
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 960px) {
+  #screen-home { flex-direction: column !important; }
+  .sidebar { display: none; }
+  .materi-inner { padding: 22px 18px; }
+  #screen-editor { flex-direction: column !important; }
+  .editor-sidebar { display: none; }
+  .editor-right { display: none; }
+  .opts-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .nav-tab span { display: none; }
+  .hdr-stats .stat-chip { padding: 4px 8px; font-size: 11px; }
+  .materi-title { font-size: 26px; }
+}
+</style>
+</head>
+<body>
+
+<!-- WELCOME OVERLAY -->
+<div id="welcome-overlay">
+  <div class="wo-logo">CodeCraft</div>
+  <div class="wo-sub">Platform Belajar C++ Interaktif</div>
+  <div class="wo-bar-wrap"><div class="wo-bar"></div></div>
+  <div class="wo-tip">Memuat materi, kuis, dan editor...</div>
+</div>
+
+<!-- XP TOAST -->
+<div class="xp-toast" id="xp-toast">+10 XP</div>
+<div class="save-toast" id="save-toast">💾 Kode tersimpan!</div>
+<div class="conf-wrap" id="conf-wrap"></div>
+
+<!-- ===== HEADER ===== -->
+<header id="header">
+  <div class="logo">
+    <div class="logo-badge">C++</div>
+    <span>Code<span class="logo-accent">Craft</span></span>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('home')" data-tab="home">
+      <span class="tab-icon">📚</span><span>Materi</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('quiz')" data-tab="quiz">
+      <span class="tab-icon">🧠</span><span>Kuis</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('editor')" data-tab="editor">
+      <span class="tab-icon">💻</span><span>Editor</span>
+    </button>
+  </div>
+
+  <div class="hdr-stats">
+    <div class="stat-chip xp" id="stat-xp" title="Total XP kamu">⚡ <span id="h-xp">0</span></div>
+    <div class="stat-chip streak" id="stat-streak" title="Streak benar berturut-turut">🔥 <span id="h-streak">0</span></div>
+    <div class="tip-wrap">
+      <div class="stat-chip hp">❤️ <span id="h-hp">5</span></div>
+      <div class="tooltip">
+        <strong style="color:var(--text)">Lives (Nyawa)</strong><br>
+        Berkurang saat kamu salah jawab kuis.<br>
+        Kamu punya 5 nyawa per sesi.
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PROGRESS BAR -->
+<div class="hdr-progress">
+  <div class="hdr-progress-fill" id="hdr-prog"></div>
+</div>
+
+<!-- ===== SCREEN: MATERI ===== -->
+<div class="screen active" id="screen-home">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="materi-scroll" id="materi-scroll">
+    <div class="materi-inner" id="materi-content"></div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: QUIZ ===== -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-inner">
+    <div id="quiz-selector"></div>
+    <div id="quiz-game" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: EDITOR ===== -->
+<div class="screen" id="screen-editor">
+  <div class="editor-sidebar">
+    <div class="es-header">💻 Tantangan Coding</div>
+    <div class="es-tabs">
+      <button class="es-tab active" onclick="editorTabSwitch('challenges',this)">Tantangan</button>
+      <button class="es-tab" onclick="editorTabSwitch('playground',this)">Playground</button>
+    </div>
+    <div class="es-challenges" id="challenges-list"></div>
+  </div>
+
+  <div class="editor-main">
+    <div class="editor-topbar">
+      <div class="editor-title" id="editor-title">← Pilih tantangan dari daftar</div>
+      <div class="editor-actions">
+        <div class="unsaved-dot" id="unsaved-dot" title="Ada perubahan belum disimpan"></div>
+        <button class="ea-btn hint" onclick="showHint()">💡 Petunjuk</button>
+        <button class="ea-btn save" onclick="saveCode()">💾 Simpan</button>
+        <button class="ea-btn reset" onclick="resetCode()">↺ Reset</button>
+        <button class="ea-btn run" onclick="runCode()">▶ Jalankan</button>
+      </div>
+    </div>
+
+    <div class="editor-layout">
+      <div class="editor-left">
+        <div class="code-editor-wrap">
+          <div class="line-nums" id="line-nums"></div>
+          <textarea id="code-textarea" spellcheck="false" autocorrect="off" autocapitalize="off"
+            placeholder="// Tulis kode C++ kamu di sini..."
+            oninput="onCodeInput()"
+            onkeydown="handleEditorKey(event)"></textarea>
+        </div>
+        <div class="output-panel">
+          <div class="output-header">
+            <span>Output Konsol</span>
+            <span class="output-status idle" id="output-status">Idle</span>
+          </div>
+          <div id="output-text">// Klik ▶ Jalankan untuk eksekusi kode</div>
+        </div>
+      </div>
+
+      <div class="editor-right">
+        <div class="rp-tabs">
+          <button class="rp-tab active" onclick="switchRpTab('problem',this)">📋 Soal</button>
+          <button class="rp-tab" onclick="switchRpTab('analysis',this)">🤖 AI Analisis</button>
+        </div>
+        <div class="rp-content" id="rp-problem">
+          <div style="text-align:center;padding:36px 12px;color:var(--text3)">
+            <div style="font-size:36px;margin-bottom:10px">🎯</div>
+            <div style="font-size:13px;line-height:1.7">Pilih tantangan dari daftar<br>untuk melihat deskripsi soal.</div>
+          </div>
+        </div>
+        <div class="rp-content" id="rp-analysis" style="display:none">
+          <div class="ai-idle">
+            <span class="ai-idle-icon">🤖</span>
+            Jalankan kode kamu — AI akan otomatis menganalisis error dan menunjukkan cara memperbaikinya.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DATA: MATERI (15 topik)
+============================================================ */
+const MATERI = [
+  {
+    id:'intro', icon:'👋', label:'Pengenalan C++', section:'Dasar',
+    badge:'Dasar', title:'Pengenalan C++',
+    desc:'Pelajari sejarah, kegunaan, dan cara kerja bahasa pemrograman C++ dari nol.',
+    content:`
+<h2>Apa itu C++?</h2>
+<p>C++ adalah bahasa pemrograman tingkat tinggi yang dikembangkan oleh <strong>Bjarne Stroustrup</strong> di Bell Labs pada awal 1980-an. C++ merupakan ekstensi dari bahasa C dengan tambahan fitur <em>Object-Oriented Programming (OOP)</em>.</p>
+<div class="info-box note"><div class="ib-icon">💡</div><div class="ib-text"><strong>Fun Fact:</strong> Nama "C++" berasal dari operator increment (++) dalam C — artinya "satu langkah lebih maju dari C".</div></div>
+<h2>Kenapa Belajar C++?</h2>
+<ul>
+<li><strong>Game Development</strong> — Unreal Engine, game AAA seperti GTA V menggunakan C++</li>
+<li><strong>Sistem Operasi</strong> — Bagian inti Windows, macOS, dan Linux ditulis C++</li>
+<li><strong>Embedded Systems</strong> — Arduino, robotika, perangkat IoT</li>
+<li><strong>High-Performance Apps</strong> — Browser engines (Chrome, Firefox), database</li>
+<li><strong>Competitive Programming</strong> — Bahasa paling populer di olimpiade komputer</li>
+</ul>
+<h2>Program C++ Pertamamu</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">hello.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="pp">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    cout &lt;&lt; <span class="str">"Hello, World!"</span> &lt;&lt; endl;
+    <span class="kw">return</span> <span class="num">0</span>;
+}</div></div>
+<h3>Penjelasan baris per baris:</h3>
+<ul>
+<li><code>#include &lt;iostream&gt;</code> — Mengimpor library input/output standar</li>
+<li><code>using namespace std;</code> — Agar tidak perlu menulis <code>std::</code> di depan <code>cout</code></li>
+<li><code>int main()</code> — Fungsi utama, titik awal eksekusi program</li>
+<li><code>cout &lt;&lt; "Hello"</code> — Mencetak teks ke layar</li>
+<li><code>return 0;</code> — Mengembalikan 0 (sukses) ke sistem operasi</li>
+</ul>
+<div class="info-box tip"><div class="ib-icon">✅</div><div class="ib-text"><strong>Tips:</strong> Ekstensi file C++ adalah <strong>.cpp</strong>. Jangan menggunakan <code>.c</code> karena itu untuk bahasa C biasa.</div></div>`
+  },
+  {
+    id:'variables', icon:'📦', label:'Variabel & Tipe Data', section:'Dasar',
+    badge:'Dasar', title:'Variabel & Tipe Data',
+    desc:'Cara menyimpan data, tipe-tipe data dasar, dan aturan penamaan variabel.',
+    content:`
+<h2>Apa itu Variabel?</h2>
+<p>Variabel adalah <strong>tempat penyimpanan data</strong> di memori komputer. Setiap variabel punya nama, tipe data, dan nilai.</p>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">variables.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="ty">int</span> umur = <span class="num">17</span>;
+<span class="ty">double</span> nilai = <span class="num">95.5</span>;
+<span class="ty">char</span> huruf = <span class="str">'A'</span>;
+<span class="ty">string</span> nama = <span class="str">"Budi"</span>;
+<span class="ty">bool</span> lulus = <span class="kw">true</span>;</div></div>
+<h2>Tipe Data Dasar</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">datatypes.cpp</span></div>
+<div class="cb-body"><span class="ty">int</span> x = <span class="num">100</span>;              <span class="com">// 4 byte, bilangan bulat</span>
+<span class="ty">long long</span> big = <span class="num">9999999999LL</span>; <span class="com">// 8 byte</span>
+<span class="ty">float</span> f = <span class="num">3.14f</span>;          <span class="com">// 4 byte, desimal</span>
+<span class="ty">double</span> d = <span class="num">3.14159265</span>;   <span class="com">// 8 byte, presisi tinggi</span>
+<span class="ty">char</span> c = <span class="str">'Z'</span>;             <span class="com">// 1 byte, karakter</span>
+<span class="ty">bool</span> b = <span class="kw">false</span>;           <span class="com">// true / false</span></div></div>
+<h2>const — Variabel Konstanta</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">const.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="kw">const</span> <span class="ty">double</span> PI = <span class="num">3.14159</span>;
+<span class="kw">const</span> <span class="ty">int</span> MAX_SIZE = <span class="num">100</span>;
+<span class="com">// PI = 3.0; // ERROR! const tidak bisa diubah</span></div></div>
+<div class="info-box danger"><div class="ib-icon">❌</div><div class="ib-text"><strong>Nama TIDAK VALID:</strong> <code>2myVar</code> (diawali angka), <code>my-var</code> (tanda minus), <code>my var</code> (ada spasi), <code>int</code> (keyword C++).</div></div>`
+  },
+  {
+    id:'operators', icon:'⚙️', label:'Operator', section:'Dasar',
+    badge:'Dasar', title:'Operator di C++',
+    desc:'Operator aritmatika, perbandingan, logika, dan assignment di C++.',
+    content:`
+<h2>Operator Aritmatika</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">arithmetic.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="ty">int</span> a = <span class="num">10</span>, b = <span class="num">3</span>;
+cout &lt;&lt; a + b;   <span class="com">// 13</span>
+cout &lt;&lt; a - b;   <span class="com">// 7</span>
+cout &lt;&lt; a * b;   <span class="com">// 30</span>
+cout &lt;&lt; a / b;   <span class="com">// 3 (pembagian bulat!)</span>
+cout &lt;&lt; a % b;   <span class="com">// 1 (modulus / sisa bagi)</span>
+cout &lt;&lt; a++;     <span class="com">// 10, lalu a jadi 11</span>
+cout &lt;&lt; ++b;     <span class="com">// b jadi 4, cetak 4</span></div></div>
+<div class="info-box warn"><div class="ib-icon">⚠️</div><div class="ib-text"><strong>Perhatian:</strong> Pembagian integer menghasilkan integer! Gunakan <code>double</code>: <code>10.0 / 3</code> = 3.333...</div></div>
+<h2>Operator Perbandingan & Logika</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">comparison.cpp</span></div>
+<div class="cb-body">cout &lt;&lt; (5 == 5);       <span class="com">// 1 (true)</span>
+cout &lt;&lt; (5 != 3);       <span class="com">// 1 (true)</span>
+cout &lt;&lt; (5 > 3);        <span class="com">// 1 (true)</span>
+cout &lt;&lt; (5>3 &amp;&amp; 2&lt;4);  <span class="com">// 1 — AND (keduanya true)</span>
+cout &lt;&lt; (5>3 || 2>4);  <span class="com">// 1 — OR (salah satu true)</span>
+cout &lt;&lt; !(5>3);         <span class="com">// 0 — NOT (dibalik)</span></div></div>`
+  },
+  {
+    id:'strings', icon:'📜', label:'String', section:'Dasar',
+    badge:'Dasar', title:'String di C++',
+    desc:'Cara mengelola teks: deklarasi, manipulasi, dan method-method string penting.',
+    content:`
+<h2>Deklarasi & Operasi Dasar</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">strings.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="pp">#include</span> <span class="str">&lt;string&gt;</span>
+<span class="ty">string</span> s = <span class="str">"Hello World"</span>;
+
+cout &lt;&lt; s.length();       <span class="com">// 11</span>
+cout &lt;&lt; s[<span class="num">0</span>];            <span class="com">// 'H'</span>
+cout &lt;&lt; s.substr(<span class="num">6</span>, <span class="num">5</span>); <span class="com">// "World"</span>
+cout &lt;&lt; s.find(<span class="str">"World"</span>); <span class="com">// 6</span>
+s += <span class="str">"!"</span>;               <span class="com">// "Hello World!"</span>
+cout &lt;&lt; s.empty();       <span class="com">// 0 (false)</span></div></div>
+<div class="info-box danger"><div class="ib-icon">❌</div><div class="ib-text"><strong>Bug Umum:</strong> Setelah <code>cin &gt;&gt;</code>, ada karakter newline tersisa. Gunakan <code>cin.ignore();</code> sebelum <code>getline()</code>.</div></div>`
+  },
+  {
+    id:'conditions', icon:'🔀', label:'Kondisi If/Else', section:'Kontrol Alur',
+    badge:'Kontrol Alur', title:'Kondisi If/Else & Switch',
+    desc:'Cara membuat keputusan di program: if, else if, else, switch-case, dan ternary.',
+    content:`
+<h2>If / Else If / Else</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">if_else.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="ty">int</span> nilai = <span class="num">85</span>;
+<span class="kw">if</span> (nilai >= <span class="num">90</span>) cout &lt;&lt; <span class="str">"Grade A"</span>;
+<span class="kw">else if</span> (nilai >= <span class="num">75</span>) cout &lt;&lt; <span class="str">"Grade B"</span>;
+<span class="kw">else if</span> (nilai >= <span class="num">60</span>) cout &lt;&lt; <span class="str">"Grade C"</span>;
+<span class="kw">else</span> cout &lt;&lt; <span class="str">"Grade D"</span>;</div></div>
+<h2>Ternary & Switch</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">ternary_switch.cpp</span></div>
+<div class="cb-body"><span class="com">// Ternary: kondisi ? nilai_true : nilai_false</span>
+<span class="ty">int</span> maks = (a > b) ? a : b;
+
+<span class="kw">switch</span> (hari) {
+    <span class="kw">case</span> <span class="num">1</span>: cout &lt;&lt; <span class="str">"Senin"</span>;  <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="num">2</span>: cout &lt;&lt; <span class="str">"Selasa"</span>; <span class="kw">break</span>;
+    <span class="kw">default</span>: cout &lt;&lt; <span class="str">"Lainnya"</span>;
+}</div></div>
+<div class="info-box warn"><div class="ib-icon">⚠️</div><div class="ib-text"><strong>Jangan lupa break!</strong> Tanpa <code>break</code>, eksekusi akan <em>fall-through</em> ke case berikutnya secara otomatis.</div></div>`
+  },
+  {
+    id:'loops', icon:'🔁', label:'Perulangan (Loop)', section:'Kontrol Alur',
+    badge:'Kontrol Alur', title:'Loop: For, While, Do-While',
+    desc:'Semua jenis perulangan: for loop, while loop, do-while, dan break/continue.',
+    content:`
+<h2>For Loop</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">for_loop.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; <span class="num">5</span>; i++) {
+    cout &lt;&lt; i &lt;&lt; <span class="str">" "</span>;  <span class="com">// 0 1 2 3 4</span>
+}
+
+<span class="com">// Range-based for (C++11)</span>
+<span class="ty">int</span> arr[] = {<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>};
+<span class="kw">for</span> (<span class="ty">int</span> x : arr) cout &lt;&lt; x &lt;&lt; <span class="str">" "</span>;</div></div>
+<h2>While & Do-While</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">while_do.cpp</span></div>
+<div class="cb-body"><span class="ty">int</span> i = <span class="num">0</span>;
+<span class="kw">while</span> (i &lt; <span class="num">5</span>) { cout &lt;&lt; i++; }  <span class="com">// 01234</span>
+
+<span class="kw">do</span> {
+    cout &lt;&lt; i;   <span class="com">// pasti jalan MINIMAL SEKALI</span>
+} <span class="kw">while</span> (i &lt; <span class="num">0</span>);
+
+<span class="com">// break dan continue</span>
+<span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; <span class="num">6</span>; i++) {
+    <span class="kw">if</span> (i == <span class="num">3</span>) <span class="kw">continue</span>; <span class="com">// skip 3</span>
+    cout &lt;&lt; i &lt;&lt; <span class="str">" "</span>;        <span class="com">// 0 1 2 4 5</span>
+}</div></div>`
+  },
+  {
+    id:'functions', icon:'🔧', label:'Function', section:'Function',
+    badge:'Function', title:'Function di C++',
+    desc:'Cara membuat dan menggunakan function, parameter, return value, overloading, rekursi.',
+    content:`
+<h2>Membuat & Memanggil Function</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">functions.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="ty">void</span> <span class="fn">sapa</span>(<span class="ty">string</span> nama) {
+    cout &lt;&lt; <span class="str">"Halo, "</span> &lt;&lt; nama &lt;&lt; <span class="str">"!"</span>;
+}
+<span class="ty">int</span> <span class="fn">tambah</span>(<span class="ty">int</span> a, <span class="ty">int</span> b) { <span class="kw">return</span> a + b; }
+
+<span class="com">// Default parameter</span>
+<span class="ty">void</span> <span class="fn">cetak</span>(<span class="ty">string</span> msg, <span class="ty">int</span> n = <span class="num">1</span>) {
+    <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; n; i++) cout &lt;&lt; msg;
+}</div></div>
+<h2>Rekursi</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">recursion.cpp</span></div>
+<div class="cb-body"><span class="ty">int</span> <span class="fn">faktorial</span>(<span class="ty">int</span> n) {
+    <span class="kw">if</span> (n &lt;= <span class="num">1</span>) <span class="kw">return</span> <span class="num">1</span>;   <span class="com">// base case — WAJIB!</span>
+    <span class="kw">return</span> n * faktorial(n - <span class="num">1</span>);
+}
+cout &lt;&lt; faktorial(<span class="num">5</span>);  <span class="com">// 120</span></div></div>
+<div class="info-box warn"><div class="ib-icon">⚠️</div><div class="ib-text"><strong>Stack Overflow!</strong> Rekursi tanpa base case yang benar akan crash. Selalu pastikan ada kondisi berhenti (base case).</div></div>`
+  },
+  {
+    id:'arrays', icon:'📊', label:'Array', section:'Array & Pointer',
+    badge:'Array & Pointer', title:'Array di C++',
+    desc:'Array satu dimensi, multi dimensi, cara iterasi, dan ukuran array.',
+    content:`
+<h2>Array Dasar</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">arrays.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="ty">int</span> angka[<span class="num">5</span>] = {<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>};
+cout &lt;&lt; angka[<span class="num">0</span>];   <span class="com">// 10 (index mulai dari 0!)</span>
+cout &lt;&lt; angka[<span class="num">2</span>];   <span class="com">// 30</span>
+
+<span class="ty">int</span> size = <span class="kw">sizeof</span>(angka) / <span class="kw">sizeof</span>(angka[<span class="num">0</span>]);  <span class="com">// 5</span>
+<span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; size; i++) cout &lt;&lt; angka[i] &lt;&lt; <span class="str">" "</span>;</div></div>
+<h2>Array 2 Dimensi (Matriks)</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">matrix.cpp</span></div>
+<div class="cb-body"><span class="ty">int</span> matrix[<span class="num">3</span>][<span class="num">3</span>] = {{<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>},{<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>},{<span class="num">7</span>,<span class="num">8</span>,<span class="num">9</span>}};
+cout &lt;&lt; matrix[<span class="num">1</span>][<span class="num">2</span>];   <span class="com">// 6 (baris 1, kolom 2)</span></div></div>
+<div class="info-box danger"><div class="ib-icon">❌</div><div class="ib-text"><strong>Out-of-Bounds!</strong> Mengakses index di luar ukuran array adalah <em>undefined behavior</em> — bisa crash atau data korup.</div></div>`
+  },
+  {
+    id:'pointers', icon:'👉', label:'Pointer & Reference', section:'Array & Pointer',
+    badge:'Array & Pointer', title:'Pointer & Reference',
+    desc:'Konsep pointer, alamat memori, dereference, dan reference sebagai alias variabel.',
+    content:`
+<h2>Pointer</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">pointers.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="ty">int</span> x = <span class="num">42</span>;
+<span class="ty">int</span>* ptr = &amp;x;    <span class="com">// ptr menyimpan ALAMAT x</span>
+cout &lt;&lt; *ptr;     <span class="com">// 42 — dereference: baca nilainya</span>
+*ptr = <span class="num">100</span>;      <span class="com">// x berubah jadi 100 lewat pointer!</span></div></div>
+<h2>Reference & Dynamic Memory</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">references.cpp</span></div>
+<div class="cb-body"><span class="ty">int</span> a = <span class="num">10</span>;
+<span class="ty">int</span>&amp; ref = a;   <span class="com">// ref adalah alias (nama lain) dari a</span>
+ref = <span class="num">20</span>;       <span class="com">// a ikut berubah menjadi 20!</span>
+
+<span class="com">// Dynamic memory</span>
+<span class="ty">int</span>* p = <span class="kw">new</span> <span class="ty">int</span>(<span class="num">42</span>);
+<span class="kw">delete</span> p;  <span class="com">// WAJIB! Hindari memory leak</span></div></div>
+<div class="info-box danger"><div class="ib-icon">❌</div><div class="ib-text"><strong>Memory Leak!</strong> Lupa <code>delete</code> setelah <code>new</code> = memory yang terbuang. Pertimbangkan <code>unique_ptr</code> dari C++11.</div></div>`
+  },
+  {
+    id:'oop', icon:'🏛️', label:'OOP Dasar', section:'OOP',
+    badge:'OOP', title:'Object-Oriented Programming',
+    desc:'Class, object, constructor, destructor, encapsulation — cara membuat tipe data sendiri.',
+    content:`
+<h2>Class dan Object</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">oop_basic.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="kw">class</span> <span class="ty">Mobil</span> {
+<span class="kw">public</span>:
+    <span class="ty">string</span> merk;
+    <span class="ty">int</span> tahun;
+
+    <span class="fn">Mobil</span>(<span class="ty">string</span> m, <span class="ty">int</span> t) : merk(m), tahun(t) {
+        cout &lt;&lt; merk &lt;&lt; <span class="str">" dibuat!\n"</span>;
+    }
+    ~<span class="fn">Mobil</span>() { cout &lt;&lt; merk &lt;&lt; <span class="str">" dihapus\n"</span>; }
+    <span class="ty">void</span> <span class="fn">info</span>() { cout &lt;&lt; merk &lt;&lt; <span class="str">" ("</span> &lt;&lt; tahun &lt;&lt; <span class="str">")"</span>; }
+};
+
+Mobil m1(<span class="str">"Toyota"</span>, <span class="num">2023</span>);
+m1.info();</div></div>
+<h2>Encapsulation — Data Tersembunyi</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">encapsulation.cpp</span></div>
+<div class="cb-body"><span class="kw">class</span> <span class="ty">RekeningBank</span> {
+<span class="kw">private</span>:
+    <span class="ty">double</span> saldo;  <span class="com">// tidak bisa diakses langsung dari luar</span>
+<span class="kw">public</span>:
+    <span class="fn">RekeningBank</span>(<span class="ty">double</span> s = <span class="num">0</span>) : saldo(s) {}
+    <span class="ty">double</span> <span class="fn">getSaldo</span>() { <span class="kw">return</span> saldo; }
+    <span class="ty">void</span> <span class="fn">setor</span>(<span class="ty">double</span> a) { <span class="kw">if</span> (a > <span class="num">0</span>) saldo += a; }
+};</div></div>`
+  },
+  {
+    id:'inheritance', icon:'🧬', label:'Inheritance', section:'OOP',
+    badge:'OOP', title:'Inheritance (Pewarisan)',
+    desc:'Child class mewarisi attribute dan method dari parent class.',
+    content:`
+<h2>Inheritance Dasar</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">inheritance.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="kw">class</span> <span class="ty">Hewan</span> {
+<span class="kw">public</span>:
+    <span class="ty">string</span> nama;
+    <span class="ty">void</span> <span class="fn">makan</span>() { cout &lt;&lt; nama &lt;&lt; <span class="str">" makan\n"</span>; }
+    <span class="ty">virtual</span> <span class="ty">void</span> <span class="fn">suara</span>() { cout &lt;&lt; <span class="str">"...\n"</span>; }
+};
+
+<span class="kw">class</span> <span class="ty">Anjing</span> : <span class="kw">public</span> <span class="ty">Hewan</span> {
+<span class="kw">public</span>:
+    <span class="ty">void</span> <span class="fn">suara</span>() <span class="kw">override</span> { cout &lt;&lt; <span class="str">"Guk guk!\n"</span>; }
+};
+
+Anjing d; d.nama = <span class="str">"Rex"</span>;
+d.makan();  <span class="com">// warisan dari Hewan</span>
+d.suara();  <span class="com">// override: Guk guk!</span></div></div>
+<div class="info-box note"><div class="ib-icon">💡</div><div class="ib-text"><strong>Access Specifiers:</strong> <code>public</code> = semua bisa akses · <code>protected</code> = Base + child · <code>private</code> = Base saja.</div></div>`
+  },
+  {
+    id:'polymorphism', icon:'🦋', label:'Polymorphism', section:'OOP',
+    badge:'OOP', title:'Polymorphism & Abstract Class',
+    desc:'Virtual function, method overriding, pure virtual, dan abstract class.',
+    content:`
+<h2>Polymorphism dengan Virtual</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">polymorphism.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="kw">class</span> <span class="ty">Bentuk</span> {
+<span class="kw">public</span>:
+    <span class="ty">virtual</span> <span class="ty">double</span> <span class="fn">luas</span>() = <span class="num">0</span>;  <span class="com">// pure virtual = abstract!</span>
+};
+
+<span class="kw">class</span> <span class="ty">Persegi</span> : <span class="kw">public</span> <span class="ty">Bentuk</span> {
+    <span class="ty">double</span> sisi;
+<span class="kw">public</span>:
+    <span class="fn">Persegi</span>(<span class="ty">double</span> s) : sisi(s) {}
+    <span class="ty">double</span> <span class="fn">luas</span>() <span class="kw">override</span> { <span class="kw">return</span> sisi * sisi; }
+};
+
+<span class="com">// Polymorphism via pointer base class</span>
+<span class="ty">Bentuk</span>* b = <span class="kw">new</span> Persegi(<span class="num">5</span>);
+cout &lt;&lt; b-&gt;luas();  <span class="com">// 25</span>
+<span class="kw">delete</span> b;</div></div>`
+  },
+  {
+    id:'stl', icon:'📦', label:'STL', section:'STL',
+    badge:'STL', title:'Standard Template Library (STL)',
+    desc:'Vector, map, set, stack, queue, dan algorithm dari library standar C++.',
+    content:`
+<h2>Vector — Dynamic Array</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">vector.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="pp">#include</span> <span class="str">&lt;vector&gt;</span>
+<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt; v = {<span class="num">3</span>, <span class="num">1</span>, <span class="num">4</span>};
+v.push_back(<span class="num">9</span>);    <span class="com">// tambah di belakang</span>
+v.pop_back();       <span class="com">// hapus elemen terakhir</span>
+cout &lt;&lt; v.size();  <span class="com">// ukuran vector</span></div></div>
+<h2>Map & Algorithm</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">map_algo.cpp</span></div>
+<div class="cb-body"><span class="pp">#include</span> <span class="str">&lt;map&gt;</span>
+<span class="pp">#include</span> <span class="str">&lt;algorithm&gt;</span>
+<span class="ty">map</span>&lt;<span class="ty">string</span>, <span class="ty">int</span>&gt; nilai;
+nilai[<span class="str">"Budi"</span>] = <span class="num">90</span>;
+nilai[<span class="str">"Ani"</span>]  = <span class="num">85</span>;
+
+<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt; v = {<span class="num">5</span>,<span class="num">2</span>,<span class="num">8</span>,<span class="num">1</span>};
+sort(v.begin(), v.end());          <span class="com">// ascending</span>
+<span class="ty">int</span> mx = *max_element(v.begin(), v.end());</div></div>`
+  },
+  {
+    id:'exceptions', icon:'⚠️', label:'Exception Handling', section:'Advanced',
+    badge:'Advanced', title:'Exception Handling (try-catch)',
+    desc:'Menangani error runtime dengan try, catch, throw, dan standard exceptions.',
+    content:`
+<h2>Try-Catch-Throw</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">exceptions.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="pp">#include</span> <span class="str">&lt;stdexcept&gt;</span>
+
+<span class="ty">int</span> <span class="fn">bagi</span>(<span class="ty">int</span> a, <span class="ty">int</span> b) {
+    <span class="kw">if</span> (b == <span class="num">0</span>)
+        <span class="kw">throw</span> runtime_error(<span class="str">"Bagi dengan nol!"</span>);
+    <span class="kw">return</span> a / b;
+}
+
+<span class="kw">try</span> {
+    cout &lt;&lt; bagi(<span class="num">10</span>, <span class="num">0</span>);
+} <span class="kw">catch</span> (<span class="kw">const</span> runtime_error&amp; e) {
+    cout &lt;&lt; <span class="str">"Error: "</span> &lt;&lt; e.what();
+} <span class="kw">catch</span> (...) {
+    cout &lt;&lt; <span class="str">"Error tidak dikenal"</span>;
+}</div></div>`
+  },
+  {
+    id:'files', icon:'📁', label:'File I/O', section:'Advanced',
+    badge:'Advanced', title:'File Input/Output',
+    desc:'Membaca dan menulis file menggunakan fstream, ifstream, dan ofstream.',
+    content:`
+<h2>Menulis & Membaca File</h2>
+<div class="code-block"><div class="cb-header"><div class="cb-dots"><span></span><span></span><span></span></div><span class="cb-filename">file_io.cpp</span><button class="cb-copy" onclick="copyCode(this)">Salin</button></div>
+<div class="cb-body"><span class="pp">#include</span> <span class="str">&lt;fstream&gt;</span>
+
+<span class="com">// Menulis ke file</span>
+<span class="ty">ofstream</span> fout(<span class="str">"data.txt"</span>);
+fout &lt;&lt; <span class="str">"Baris pertama\n"</span>;
+fout &lt;&lt; <span class="num">42</span> &lt;&lt; endl;
+fout.close();  <span class="com">// WAJIB ditutup!</span>
+
+<span class="com">// Membaca dari file</span>
+<span class="ty">ifstream</span> fin(<span class="str">"data.txt"</span>);
+<span class="ty">string</span> line;
+<span class="kw">while</span> (getline(fin, line)) cout &lt;&lt; line &lt;&lt; <span class="str">"\n"</span>;
+fin.close();  <span class="com">// WAJIB ditutup!</span></div></div>`
+  }
+];
+
+/* ============================================================
+   DATA: QUIZ
+============================================================ */
+const QUIZ_CHAPTERS = [
+  {id:'q_intro',title:'Pengenalan C++',icon:'👋',topicId:'intro',color:'#4af4c0',questions:[
+    {q:'C++ dikembangkan oleh siapa?',opts:['Dennis Ritchie','Bjarne Stroustrup','James Gosling','Linus Torvalds'],ans:1,exp:'C++ dibuat oleh Bjarne Stroustrup di Bell Labs sekitar 1979-1983 sebagai ekstensi dari bahasa C.',type:'Pilihan Ganda',demo:`#include <iostream>\nusing namespace std;\nint main() { cout << "C++ by Bjarne!"; }`,demoOut:'C++ by Bjarne!',isErr:false},
+    {q:'Ekstensi file C++ yang benar adalah?',opts:['.c','.cpp','.java','.cc'],ans:1,exp:'.cpp adalah ekstensi standar C++. .c digunakan untuk bahasa C biasa.',type:'Pilihan Ganda',demo:`// Nama file: main.cpp\n#include <iostream>\nusing namespace std;\nint main() { cout << "File .cpp!"; }`,demoOut:'File .cpp!',isErr:false},
+    {q:'Fungsi `main()` berfungsi sebagai?',opts:['Fungsi utama library','Entry point program','Fungsi untuk output','Deklarasi global'],ans:1,exp:'main() adalah fungsi wajib yang menjadi titik awal eksekusi setiap program C++.',type:'Pilihan Ganda',demo:`int main() {\n    // program dimulai di sini\n    return 0;\n}`,demoOut:'(program berjalan dari main)',isErr:false},
+    {q:'`#include <iostream>` berguna untuk?',opts:['Import math library','Import library I/O (cout,cin)','Membuat class','Mendefinisikan array'],ans:1,exp:'iostream menyediakan cout, cin, cerr untuk operasi I/O standar.',type:'Pilihan Ganda',demo:`#include <iostream>\nusing namespace std;\nint main() { cout << "iostream aktif!"; }`,demoOut:'iostream aktif!',isErr:false},
+  ]},
+  {id:'q_vars',title:'Variabel & Tipe Data',icon:'📦',topicId:'variables',color:'#ffc857',questions:[
+    {q:'Deklarasi variabel integer yang benar?',opts:['variable int x = 5;','int x = 5;','x = int 5;','declare x as int = 5;'],ans:1,exp:'Sintaks: [tipe] [nama] = [nilai]; — tipe data ditulis pertama.',type:'Pilihan Ganda',demo:`int x = 5;\ncout << x;`,demoOut:'5',isErr:false},
+    {q:'Tipe data untuk bilangan desimal presisi tinggi?',opts:['int','float','double','decimal'],ans:2,exp:'double adalah 64-bit dengan presisi lebih tinggi dari float (32-bit).',type:'Pilihan Ganda',demo:`double pi = 3.14159265;\ncout << pi;`,demoOut:'3.14159265',isErr:false},
+    {q:'Hasil: `int x=10; const int Y=5; cout<<x+Y;`',opts:['Error','15','x+Y','10'],ans:1,exp:'x + Y = 10 + 5 = 15. const bisa dibaca tapi tidak bisa diubah.',type:'Pilihan Ganda',demo:`int x = 10;\nconst int Y = 5;\ncout << x + Y;`,demoOut:'15',isErr:false},
+    {q:'Nama variabel mana yang VALID?',opts:['2myVar','my-var','_myVar','my var'],ans:2,exp:'_myVar valid: diawali underscore, tidak ada spasi atau simbol.',type:'Pilihan Ganda',demo:`int _myVar = 42;\ncout << _myVar;`,demoOut:'42',isErr:false},
+  ]},
+  {id:'q_ops',title:'Operator',icon:'⚙️',topicId:'operators',color:'#ff9640',questions:[
+    {q:'Hasil dari `10 % 3` adalah?',opts:['3','1','0','3.33'],ans:1,exp:'% adalah modulus (sisa bagi). 10 ÷ 3 = 3 sisa 1.',type:'Pilihan Ganda',demo:`int r = 10 % 3;\ncout << r;`,demoOut:'1',isErr:false},
+    {q:'Perbedaan `++x` vs `x++`?',opts:['Tidak ada bedanya','x++ increment dulu','++x bertambah DULU lalu digunakan','Tidak valid'],ans:2,exp:'Pre-increment (++x): tambah dulu baru pakai. Post-increment (x++): pakai dulu baru tambah.',type:'Pilihan Ganda',demo:`int a = 5;\ncout << a++ << " ";\ncout << ++a;`,demoOut:'5 7',isErr:false},
+    {q:'Operator perbandingan kesamaan?',opts:['=','===','==','eq()'],ans:2,exp:'== untuk perbandingan. = untuk assignment. Jangan tertukar!',type:'Pilihan Ganda',demo:`int a = 5, b = 5;\nif (a == b) cout << "sama";`,demoOut:'sama',isErr:false},
+    {q:'Hasil `(true && false) || true`?',opts:['false','true','Error','0'],ans:1,exp:'(true && false) = false. false || true = true.',type:'Pilihan Ganda',demo:`bool r = (true && false) || true;\ncout << r;`,demoOut:'1',isErr:false},
+  ]},
+  {id:'q_strings',title:'String',icon:'📜',topicId:'strings',color:'#bf94ff',questions:[
+    {q:'Method panjang string?',opts:['s.count()','s.len()','s.length()','size saja'],ans:2,exp:'s.length() dan s.size() keduanya mengembalikan jumlah karakter.',type:'Pilihan Ganda',demo:`string s = "Hello";\ncout << s.length();`,demoOut:'5',isErr:false},
+    {q:'`s.substr(2,3)` pada "Hello"?',opts:['Hel','llo','el','ell'],ans:1,exp:'substr(mulai,panjang). Index 2 = "l", ambil 3 karakter = "llo".',type:'Pilihan Ganda',demo:`string s = "Hello";\ncout << s.substr(2, 3);`,demoOut:'llo',isErr:false},
+    {q:'`string s=""; cout<<s.empty();`',opts:['0','1','""','Error'],ans:1,exp:'empty() mengembalikan true (1) jika string kosong.',type:'Pilihan Ganda',demo:`string s = "";\ncout << s.empty();`,demoOut:'1',isErr:false},
+  ]},
+  {id:'q_cond',title:'Kondisi & Switch',icon:'🔀',topicId:'conditions',color:'#3ddc84',questions:[
+    {q:'`if(x>5) cout<<"A"; else cout<<"B";` saat x=8?',opts:['B','A','AB','Error'],ans:1,exp:'8 > 5 adalah true, jadi cetak "A".',type:'Pilihan Ganda',demo:`int x = 8;\nif (x > 5) cout << "A";\nelse cout << "B";`,demoOut:'A',isErr:false},
+    {q:'Tanpa `break` di switch-case terjadi apa?',opts:['Program crash','Fall-through ke case berikutnya','Error compile','Skip case berikutnya'],ans:1,exp:'Tanpa break, eksekusi "fall-through" ke case berikutnya secara otomatis.',type:'Temukan Bug',demo:`int x = 1;\nswitch(x) {\n  case 1: cout << "Satu";\n  case 2: cout << "Dua";\n}`,demoOut:'SatuDua',isErr:false},
+    {q:'`(5>3) ? "ya" : "tidak"` menghasilkan?',opts:['"tidak"','"ya"','5','3'],ans:1,exp:'5 > 3 adalah true, sehingga nilai setelah ? dipilih.',type:'Pilihan Ganda',demo:`string r = (5 > 3) ? "ya" : "tidak";\ncout << r;`,demoOut:'ya',isErr:false},
+  ]},
+  {id:'q_loops',title:'Perulangan',icon:'🔁',topicId:'loops',color:'#4af4c0',questions:[
+    {q:'`for(int i=0; i<5; i++)` dieksekusi berapa kali?',opts:['4','5','6','Infinite'],ans:1,exp:'i = 0,1,2,3,4. Saat i=5 kondisi false. Total 5 kali.',type:'Pilihan Ganda',demo:`for (int i = 0; i < 5; i++) cout << i << " ";`,demoOut:'0 1 2 3 4',isErr:false},
+    {q:'Loop dengan `continue` saat i==3, output 1-5?',opts:['1 2 3 4 5','1 2 4 5','1 2','3 4 5'],ans:1,exp:'continue melewati i=3, jadi 1 2 4 5.',type:'Pilihan Ganda',demo:`for (int i=1; i<=5; i++) {\n    if (i==3) continue;\n    cout << i << " ";\n}`,demoOut:'1 2 4 5',isErr:false},
+    {q:'Perbedaan while dan do-while?',opts:['Tidak ada','do-while minimal jalan sekali','while lebih cepat','do-while tidak bisa bersarang'],ans:1,exp:'do-while eksekusi body-nya DULU lalu cek kondisi. Minimal sekali dijalankan.',type:'Pilihan Ganda',demo:`int i = 100;\ndo {\n    cout << "jalan!";\n} while (i < 5);`,demoOut:'jalan!',isErr:false},
+  ]},
+  {id:'q_func',title:'Function',icon:'🔧',topicId:'functions',color:'#ff9640',questions:[
+    {q:'Fungsi tanpa return value menggunakan tipe?',opts:['null','int','void','none'],ans:2,exp:'void artinya fungsi tidak mengembalikan nilai apa pun.',type:'Pilihan Ganda',demo:`void sapa(string n) { cout << "Halo, " << n; }\nsapa("Budi");`,demoOut:'Halo, Budi',isErr:false},
+    {q:'Function overloading artinya?',opts:['Fungsi dipanggil berlebihan','Nama sama, parameter berbeda','Fungsi rekursif','Fungsi dalam class'],ans:1,exp:'Overloading: nama fungsi sama tapi tipe/jumlah parameter berbeda.',type:'Pilihan Ganda',demo:`int tambah(int a, int b) { return a+b; }\ndouble tambah(double a, double b) { return a+b; }\ncout << tambah(3, 4);`,demoOut:'7',isErr:false},
+    {q:'Base case dalam rekursi berfungsi untuk?',opts:['Mempercepat','Menghentikan rekursi','Memanggil fungsi lain','Alokasi memori'],ans:1,exp:'Base case adalah kondisi berhenti rekursi. Tanpanya akan terjadi stack overflow.',type:'Pilihan Ganda',demo:`int fakt(int n) {\n    if (n <= 1) return 1;\n    return n * fakt(n-1);\n}\ncout << fakt(5);`,demoOut:'120',isErr:false},
+  ]},
+  {id:'q_arrays',title:'Array',icon:'📊',topicId:'arrays',color:'#ffc857',questions:[
+    {q:'`int arr[]={10,20,30,40}; cout<<arr[2];`',opts:['10','20','30','40'],ans:2,exp:'Index mulai 0. arr[2] = 30.',type:'Pilihan Ganda',demo:`int arr[] = {10,20,30,40};\ncout << arr[2];`,demoOut:'30',isErr:false},
+    {q:'Cara menghitung ukuran array di C++?',opts:['arr.length()','arr.size()','sizeof(arr)/sizeof(arr[0])','count(arr)'],ans:2,exp:'sizeof(arr) total byte / sizeof(arr[0]) byte per elemen = jumlah elemen.',type:'Pilihan Ganda',demo:`int arr[] = {1,2,3,4,5};\nint size = sizeof(arr)/sizeof(arr[0]);\ncout << size;`,demoOut:'5',isErr:false},
+    {q:'`matrix[1][2]` dari {{1,2,3},{4,5,6},{7,8,9}}?',opts:['5','6','2','4'],ans:1,exp:'matrix[baris][kolom]. Baris 1, kolom 2 = 6.',type:'Pilihan Ganda',demo:`int m[3][3] = {{1,2,3},{4,5,6},{7,8,9}};\ncout << m[1][2];`,demoOut:'6',isErr:false},
+  ]},
+  {id:'q_ptr',title:'Pointer & Reference',icon:'👉',topicId:'pointers',color:'#3ddc84',questions:[
+    {q:'Apa yang disimpan oleh pointer?',opts:['Nilai variabel','Alamat memori variabel','Nama variabel','Tipe data'],ans:1,exp:'Pointer menyimpan alamat memori (address) dari variabel lain.',type:'Pilihan Ganda',demo:`int x = 42;\nint* p = &x;\ncout << *p;`,demoOut:'42',isErr:false},
+    {q:'Operator dereference pointer adalah?',opts:['&','->','*','[]'],ans:2,exp:'* (dereference) mengakses nilai yang ada di alamat yang ditunjuk pointer.',type:'Pilihan Ganda',demo:`int x = 10;\nint* p = &x;\n*p = 99;\ncout << x;`,demoOut:'99',isErr:false},
+    {q:'`int& ref = a;` artinya?',opts:['Pointer ke a','Salinan dari a','Alias (nama lain) dari a','Variabel baru'],ans:2,exp:'Reference adalah alias — ref dan a mengacu ke lokasi memori yang sama.',type:'Pilihan Ganda',demo:`int a = 5;\nint& ref = a;\nref = 20;\ncout << a;`,demoOut:'20',isErr:false},
+  ]},
+  {id:'q_oop',title:'OOP Dasar',icon:'🏛️',topicId:'oop',color:'#bf94ff',questions:[
+    {q:'"Class" dalam OOP adalah?',opts:['Instance dari objek','Blueprint untuk membuat objek','Fungsi khusus','Array dari objek'],ans:1,exp:'Class adalah blueprint. Object adalah instance nyata dari class.',type:'Pilihan Ganda',demo:`class Kucing {\npublic:\n    void suara() { cout << "Meow!"; }\n};\nKucing k; k.suara();`,demoOut:'Meow!',isErr:false},
+    {q:'Constructor dipanggil kapan?',opts:['Saat program selesai','Otomatis saat objek dibuat','Saat objek dihapus','Manual oleh programmer'],ans:1,exp:'Constructor dipanggil otomatis saat objek dibuat (diinstansiasi).',type:'Pilihan Ganda',demo:`class A {\npublic:\n    A() { cout << "Dibuat!"; }\n};\nA obj;`,demoOut:'Dibuat!',isErr:false},
+    {q:'`private` access specifier artinya?',opts:['Semua bisa akses','Hanya dalam class itu sendiri','Child class bisa akses','Hanya static'],ans:1,exp:'private: hanya bisa diakses dari dalam class itu sendiri. Ini inti dari encapsulation.',type:'Pilihan Ganda',demo:`class A {\nprivate:\n    int x = 10;\npublic:\n    int getX() { return x; }\n};\nA a; cout << a.getX();`,demoOut:'10',isErr:false},
+  ]},
+  {id:'q_inh',title:'Inheritance',icon:'🧬',topicId:'inheritance',color:'#ff9640',questions:[
+    {q:'Sintaks inheritance di C++?',opts:['class Child implements Parent','class Child : public Parent','class Child extends Parent','Child inherit Parent'],ans:1,exp:'C++ menggunakan `: public ClassName` untuk inheritance.',type:'Pilihan Ganda',demo:`class Hewan { public: void makan(){cout<<"makan";} };\nclass Anjing : public Hewan {};\nAnjing d; d.makan();`,demoOut:'makan',isErr:false},
+    {q:'`virtual` digunakan untuk?',opts:['Menghemat memori','Memungkinkan override','Membuat constructor','Konstanta'],ans:1,exp:'virtual memungkinkan polymorphism — child class bisa override method parent.',type:'Pilihan Ganda',demo:`class A { public: virtual void show() { cout << "A"; } };\nclass B : public A { public: void show() override { cout << "B"; } };\nA* p = new B();\np->show(); delete p;`,demoOut:'B',isErr:false},
+    {q:'Keyword `override` digunakan untuk?',opts:['Mewarisi method','Menyatakan eksplisit override virtual parent','Membuat method baru','Menghapus parent'],ans:1,exp:'override memberitahu compiler bahwa method ini memang override parent.',type:'Pilihan Ganda',demo:`class A { public: virtual void f() {} };\nclass B : public A { public: void f() override { cout << "Override!"; } };\nB b; b.f();`,demoOut:'Override!',isErr:false},
+  ]},
+  {id:'q_poly',title:'Polymorphism',icon:'🦋',topicId:'polymorphism',color:'#4af4c0',questions:[
+    {q:'Pure virtual function ditandai dengan?',opts:['virtual void f() = 0;','virtual void f();','void f() = pure;','abstract void f();'],ans:0,exp:'= 0 setelah deklarasi virtual menjadikannya pure virtual — class menjadi abstract.',type:'Pilihan Ganda',demo:`class Shape { public: virtual double area() = 0; };\nclass Sq : public Shape { double s; public: Sq(double x):s(x){} double area(){return s*s;} };\nShape* p = new Sq(4);\ncout << p->area(); delete p;`,demoOut:'16',isErr:false},
+    {q:'Class dengan pure virtual method disebut?',opts:['Interface class','Abstract class','Template class','Static class'],ans:1,exp:'Class dengan setidaknya satu pure virtual method disebut abstract class — tidak bisa diinstansiasi.',type:'Pilihan Ganda',demo:`class Abstract { public: virtual void f() = 0; };\nclass Concrete : public Abstract { public: void f() { cout << "OK!"; } };\nConcrete c; c.f();`,demoOut:'OK!',isErr:false},
+  ]},
+  {id:'q_stl',title:'STL',icon:'📦',topicId:'stl',color:'#3ddc84',questions:[
+    {q:'Keunggulan vector vs array biasa?',opts:['Lebih lambat','Ukuran dinamis','Hanya untuk string','Akses lebih lambat'],ans:1,exp:'Vector adalah dynamic array — ukurannya bisa berubah saat runtime.',type:'Pilihan Ganda',demo:`vector<int> v;\nv.push_back(1); v.push_back(2); v.push_back(3);\ncout << v.size();`,demoOut:'3',isErr:false},
+    {q:'`std::map` adalah?',opts:['Array terurut','Key-value pair (dictionary)','Stack','Queue'],ans:1,exp:'map adalah struktur key-value. Key unik, terurut otomatis.',type:'Pilihan Ganda',demo:`map<string,int> m;\nm["a"] = 3; m["b"] = 5;\ncout << m["a"];`,demoOut:'3',isErr:false},
+    {q:'sort() dari STL, perlu include?',opts:['<vector>','<sort>','<algorithm>','<stl>'],ans:2,exp:'Fungsi sort() dan algoritma STL ada di <algorithm>.',type:'Pilihan Ganda',demo:`#include <algorithm>\nvector<int> v = {5,2,8,1};\nsort(v.begin(), v.end());\ncout << v[0];`,demoOut:'1',isErr:false},
+  ]},
+  {id:'q_exc',title:'Exception Handling',icon:'⚠️',topicId:'exceptions',color:'#ffc857',questions:[
+    {q:'Keyword untuk melempar exception?',opts:['raise','error','throw','except'],ans:2,exp:'throw digunakan untuk melempar exception di C++.',type:'Pilihan Ganda',demo:`try {\n    throw runtime_error("test");\n} catch (const runtime_error& e) {\n    cout << e.what();\n}`,demoOut:'test',isErr:false},
+    {q:'`catch(...)` berarti?',opts:['Error','Tangkap semua exception','Tidak menangkap apa-apa','Hanya catch int'],ans:1,exp:'catch(...) adalah catch-all yang menangkap semua jenis exception.',type:'Pilihan Ganda',demo:`try { throw 42; }\ncatch (...) { cout << "Tangkap semua!"; }`,demoOut:'Tangkap semua!',isErr:false},
+  ]},
+  {id:'q_files',title:'File I/O',icon:'📁',topicId:'files',color:'#bf94ff',questions:[
+    {q:'Untuk menulis ke file, gunakan?',opts:['ifstream','ofstream','fstream read-only','filewrite'],ans:1,exp:'ofstream (output file stream) digunakan untuk menulis ke file.',type:'Pilihan Ganda',demo:`// ofstream file("out.txt");\n// file << "Hello";\n// file.close();\ncout << "File ditulis!";`,demoOut:'File ditulis!',isErr:false},
+    {q:'Setelah operasi file, sebaiknya?',opts:['Biarkan saja','Panggil file.close()','Hapus variabel','Restart program'],ans:1,exp:'Selalu panggil close() untuk memastikan buffer di-flush dan resource dibebaskan.',type:'Pilihan Ganda',demo:`// ifstream f("data.txt");\n// string s; getline(f,s);\n// f.close(); // WAJIB!\ncout << "Good practice!";`,demoOut:'Good practice!',isErr:false},
+  ]},
+];
+
+/* ============================================================
+   DATA: CHALLENGES
+============================================================ */
+const CHALLENGES = [
+  {id:'c1',title:'Hello World',diff:'easy',topic:'Pengenalan',topicId:'intro',relatedErrors:['cout','include','main'],desc:'Buat program yang mencetak teks "Hello, C++!" ke layar.',hint:'Gunakan cout << "teks"; untuk mencetak. Jangan lupa #include <iostream> dan using namespace std;',expected:'Hello, C++!',starter:`#include <iostream>\nusing namespace std;\n\nint main() {\n    // Tulis kode kamu di sini\n    \n    return 0;\n}`},
+  {id:'c2',title:'Konversi Suhu',diff:'easy',topic:'Variabel',topicId:'variables',relatedErrors:['variable','double','formula'],desc:'Suhu dalam Celsius = 100.\nKonversi ke Fahrenheit dengan rumus: F = (C × 9/5) + 32\nCetak hasilnya (hanya angkanya).\n\nOutput: 212',hint:'Gunakan tipe double untuk perhitungan. (100 * 9 / 5) + 32 = ?',expected:'212',starter:`#include <iostream>\nusing namespace std;\n\nint main() {\n    int celsius = 100;\n    \n    // Konversi ke Fahrenheit\n    // F = (C * 9/5) + 32\n    \n    return 0;\n}`},
+  {id:'c3',title:'Kalkulator Sederhana',diff:'easy',topic:'Operator',topicId:'operators',relatedErrors:['arithmetic','operator'],desc:'Hitung dan cetak:\n• 15 + 8\n• 20 - 7\n• 6 × 4\n• 15 ÷ 3\n• 17 mod 5\nSetiap hasil di baris baru.',hint:'Gunakan operator +, -, *, /, %. Gunakan \\n atau endl untuk baris baru.',expected:'23\n13\n24\n5\n2',starter:`#include <iostream>\nusing namespace std;\n\nint main() {\n    // Hitung dan cetak hasilnya\n    \n    return 0;\n}`},
+  {id:'c4',title:'Balik String',diff:'medium',topic:'String',topicId:'strings',relatedErrors:['string','loop','index'],desc:'String "CodeCraft" — cetak karakternya secara terbalik.\n\nOutput: tfarCedoC',hint:'Loop dari index terakhir (s.length()-1) mundur ke 0. Cetak s[i] tiap iterasi.',expected:'tfarCedoC',starter:`#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string s = "CodeCraft";\n    \n    // Cetak terbalik\n    \n    return 0;\n}`},
+  {id:'c5',title:'Ganjil atau Genap',diff:'easy',topic:'Kondisi',topicId:'conditions',relatedErrors:['if','condition','modulo'],desc:'Cek apakah angka 17 ganjil atau genap.\nOutput: "Ganjil" atau "Genap"',hint:'Gunakan % (modulo). Jika angka % 2 == 0, maka genap. Jika tidak, ganjil.',expected:'Ganjil',starter:`#include <iostream>\nusing namespace std;\n\nint main() {\n    int angka = 17;\n    \n    // Cek apakah ganjil atau genap\n    \n    return 0;\n}`},
+  {id:'c6',title:'FizzBuzz',diff:'medium',topic:'Loop',topicId:'loops',relatedErrors:['modulo','condition','loop'],desc:'Cetak angka 1-20:\n• Kelipatan 3 → "Fizz"\n• Kelipatan 5 → "Buzz"\n• Kelipatan 15 → "FizzBuzz"\n• Selain itu → angkanya\nDipisah spasi.',hint:'Cek kelipatan 15 (FizzBuzz) DULU sebelum cek 3 dan 5 terpisah.',expected:'1 2 Fizz 4 Buzz Fizz 7 8 Fizz Buzz 11 Fizz 13 14 FizzBuzz 16 17 Fizz 19 Buzz ',starter:`#include <iostream>\nusing namespace std;\n\nint main() {\n    for (int i = 1; i <= 20; i++) {\n        // Cek kondisi FizzBuzz\n        \n        cout << " ";\n    }\n    return 0;\n}`},
+  {id:'c7',title:'Faktorial Rekursif',diff:'medium',topic:'Function',topicId:'functions',relatedErrors:['recursion','function','return'],desc:'Buat function faktorial(n) secara rekursif.\nCetak faktorial(6).\n\n6! = 720',hint:'Base case: if n <= 1 return 1. Recursive: return n * faktorial(n-1)',expected:'720',starter:`#include <iostream>\nusing namespace std;\n\n// Buat function faktorial di sini\n\nint main() {\n    cout << faktorial(6);\n    return 0;\n}`},
+  {id:'c8',title:'Array Maximum',diff:'medium',topic:'Array',topicId:'arrays',relatedErrors:['array','index','loop'],desc:'Cari nilai terbesar dari:\n{5, 12, 3, 9, 18, 7, 15, 2}\n\nOutput: "Nilai max: 18"',hint:'Simpan nilai pertama sebagai max sementara. Loop semua, jika lebih besar, update max.',expected:'Nilai max: 18',starter:`#include <iostream>\nusing namespace std;\n\nint main() {\n    int arr[] = {5, 12, 3, 9, 18, 7, 15, 2};\n    int size = sizeof(arr) / sizeof(arr[0]);\n    \n    // Cari nilai terbesar\n    \n    return 0;\n}`},
+  {id:'c9',title:'Swap via Pointer',diff:'medium',topic:'Pointer',topicId:'pointers',relatedErrors:['pointer','dereference','swap'],desc:'Buat function swap(int* a, int* b) yang menukar dua variabel.\n\nAwal: a=10, b=25\nSetelah swap: "a=25 b=10"',hint:'Gunakan temp = *a; *a = *b; *b = temp;',expected:'a=25 b=10',starter:`#include <iostream>\nusing namespace std;\n\nvoid mySwap(int* a, int* b) {\n    // isi di sini\n}\n\nint main() {\n    int a = 10, b = 25;\n    mySwap(&a, &b);\n    cout << "a=" << a << " b=" << b;\n    return 0;\n}`},
+  {id:'c10',title:'Class Mahasiswa',diff:'medium',topic:'OOP',topicId:'oop',relatedErrors:['class','object','constructor'],desc:'Buat class "Mahasiswa" dengan:\n• Atribut: nama, nim, ipk\n• Constructor\n• Method tampilkan()\n\nOutput: "Nama: Budi, NIM: 12345, IPK: 3.75"',hint:'Sintaks: class Nama { public: atribut; constructor; method; };',expected:'Nama: Budi, NIM: 12345, IPK: 3.75',starter:`#include <iostream>\nusing namespace std;\n\n// Buat class Mahasiswa di sini\n\nint main() {\n    // Buat objek dan panggil tampilkan()\n    return 0;\n}`},
+  {id:'c11',title:'Hewan & Suara',diff:'medium',topic:'Inheritance',topicId:'inheritance',relatedErrors:['class','inheritance','override'],desc:'Buat Hewan (parent) → Anjing + Kucing (child).\n• Anjing.suara() → "Guk!"\n• Kucing.suara() → "Meow!"\n\nOutput:\nGuk!\nMeow!',hint:'Gunakan virtual pada parent, dan override pada child class.',expected:'Guk!\nMeow!',starter:`#include <iostream>\nusing namespace std;\n\nclass Hewan {\npublic:\n    virtual void suara() { cout << "..."; }\n};\n\n// Buat Anjing dan Kucing\n\nint main() {\n    // Buat objek dan panggil suara()\n    return 0;\n}`},
+  {id:'c12',title:'Luas Bentuk',diff:'hard',topic:'Polymorphism',topicId:'polymorphism',relatedErrors:['virtual','abstract','override'],desc:'Abstract class Bentuk dengan pure virtual luas().\n• Persegi(4) → 16\n• Segitiga(6,5) → 15\n\nOutput:\n16\n15',hint:'Pure virtual: virtual double luas() = 0;',expected:'16\n15',starter:`#include <iostream>\nusing namespace std;\n\nclass Bentuk {\npublic:\n    virtual double luas() = 0;\n};\n\n// Buat Persegi dan Segitiga\n\nint main() {\n    // Cetak luas keduanya\n    return 0;\n}`},
+  {id:'c13',title:'STL Leaderboard',diff:'hard',topic:'STL',topicId:'stl',relatedErrors:['vector','sort','pair'],desc:'vector<pair<string,int>>:\n("Alice",85),("Bob",92),("Cici",78),("Dodi",92)\nSort descending. Cetak "nama: skor"\n\nOutput:\nBob: 92\nDodi: 92\nAlice: 85\nCici: 78',hint:'sort() dengan lambda: [](auto& a, auto& b){ return a.second > b.second; }',expected:'Bob: 92\nDodi: 92\nAlice: 85\nCici: 78',starter:`#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    vector<pair<string,int>> scores = {\n        {"Alice",85},{"Bob",92},\n        {"Cici",78},{"Dodi",92}\n    };\n    \n    // Sort descending\n    \n    // Cetak hasilnya\n    \n    return 0;\n}`},
+  {id:'c14',title:'Bilangan Prima',diff:'hard',topic:'Exception',topicId:'exceptions',relatedErrors:['function','loop','exception'],desc:'cekPrima(1) → exception "Error: n harus >= 2"\ncekPrima(7) → "7 adalah prima"\n\nOutput:\nError: n harus >= 2\n7 adalah prima',hint:'throw invalid_argument("pesan") dan try-catch untuk menangkapnya.',expected:'Error: n harus >= 2\n7 adalah prima',starter:`#include <iostream>\n#include <stdexcept>\nusing namespace std;\n\n// Buat function cekPrima(int n)\n\nint main() {\n    // Test n=1 (harus throw)\n    // Test n=7 (prima)\n    return 0;\n}`},
+  {id:'c15',title:'Hitung Kata',diff:'hard',topic:'String & File',topicId:'files',relatedErrors:['string','loop','count'],desc:'Hitung jumlah kata dalam:\n"Belajar C++ itu menyenangkan dan mudah"\n\nOutput: "Jumlah kata: 6"',hint:'Loop karakter per karakter, hitung spasi. Kata = spasi + 1.',expected:'Jumlah kata: 6',starter:`#include <iostream>\n#include <string>\nusing namespace std;\n\n// Buat function hitungKata(string s)\n\nint main() {\n    string kalimat = "Belajar C++ itu menyenangkan dan mudah";\n    \n    // Panggil dan cetak hasilnya\n    \n    return 0;\n}`},
+];
+
+/* ============================================================
+   STATE
+============================================================ */
+let xp=0,streak=0,hp=5;
+let curTopic='intro';
+let solvedTopics={};
+let quizSt={chId:null,qIdx:0,selected:null,checked:false,correct:0};
+let edSt={challengeId:null,savedCode:{},unsaved:false,solved:{}};
+let rpTab='problem';
+
+/* ============================================================
+   INIT
+============================================================ */
+document.addEventListener('DOMContentLoaded',()=>{
+  buildSidebar();
+  loadMateri('intro');
+  buildQuizSelector();
+  buildChallengesList();
+  updateLineNums();
+});
+
+/* ============================================================
+   TAB SWITCH
+============================================================ */
+function switchTab(tab){
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const sc=document.getElementById('screen-'+tab);
+  sc.classList.add('active');
+  if(tab==='quiz'||tab==='editor'||tab==='home') sc.scrollTop=0;
+}
+
+/* ============================================================
+   SIDEBAR
+============================================================ */
+function buildSidebar(){
+  const total=MATERI.length;
+  const done=Object.keys(solvedTopics).length;
+  let html=`<div class="sidebar-header">Navigasi Materi</div>
+  <div class="progress-ring-wrap">
+    <div>
+      <div class="prog-count">${done}/${total}</div>
+      <div class="prog-label">Selesai</div>
+    </div>
+    <div class="prog-bar-mini"><div class="prog-bar-mini-fill" style="width:${Math.round(done/total*100)}%"></div></div>
+  </div>`;
+  let lastSec='';
+  MATERI.forEach(m=>{
+    if(m.section!==lastSec){
+      html+=`<div class="sidebar-section-title">${m.section}</div>`;
+      lastSec=m.section;
+    }
+    const done2=solvedTopics[m.id];
+    html+=`<div class="sidebar-item ${done2?'done':''} ${m.id===curTopic?'active':''}" id="si-${m.id}" onclick="loadMateri('${m.id}')">
+      <span class="si-icon">${m.icon}</span>
+      <span>${m.label}</span>
+      ${done2?'<span class="si-done">✓</span>':''}
+    </div>`;
+  });
+  document.getElementById('sidebar').innerHTML=html;
+
+  // global progress bar
+  const progPct=Math.round(done/total*100);
+  document.getElementById('hdr-prog').style.width=progPct+'%';
+}
+
+function loadMateri(id){
+  curTopic=id;
+  const m=MATERI.find(x=>x.id===id);
+  if(!m) return;
+  document.querySelectorAll('.sidebar-item').forEach(el=>{
+    el.classList.toggle('active',el.id===`si-${id}`);
+  });
+  const qCh=QUIZ_CHAPTERS.find(c=>c.topicId===id);
+  const qCount=qCh?qCh.questions.length:0;
+
+  document.getElementById('materi-content').innerHTML=`
+    <div><div class="materi-badge">${m.badge}</div>
+    <div class="materi-title">${m.icon} ${m.title}</div>
+    <div class="materi-desc">${m.desc}</div>
+    </div>
+    <div class="materi-divider"></div>
+    <div class="content-body">${m.content}</div>
+    ${qCount>0?`<div class="materi-quiz-cta" onclick="startQuizFromMateri('${id}')">
+      <div class="mqc-left">
+        <div class="mqc-icon">🧠</div>
+        <div>
+          <div class="mqc-title">Uji Pemahamanmu!</div>
+          <div class="mqc-sub">${qCount} soal tentang ${m.title}</div>
+        </div>
+      </div>
+      <div class="mqc-arrow">→</div>
+    </div>`:''}
+  `;
+  document.getElementById('materi-scroll').scrollTop=0;
+}
+
+function startQuizFromMateri(topicId){
+  switchTab('quiz');
+  const ch=QUIZ_CHAPTERS.find(c=>c.topicId===topicId);
+  if(ch) startQuizChapter(ch.id);
+}
+
+function copyCode(btn){
+  const code=btn.closest('.code-block').querySelector('.cb-body').textContent;
+  navigator.clipboard.writeText(code).then(()=>{
+    btn.textContent='✓ Disalin!';
+    setTimeout(()=>btn.textContent='Salin',1500);
+  });
+}
+
+/* ============================================================
+   QUIZ
+============================================================ */
+function buildQuizSelector(){
+  const doneCount=QUIZ_CHAPTERS.filter(c=>solvedTopics[c.topicId]).length;
+  let html=`<div class="quiz-selector-header">
+    <div class="qs-title">🧠 Pilih Topik Kuis</div>
+    <div class="qs-sub">Selesai: ${doneCount}/${QUIZ_CHAPTERS.length} topik</div>
+  </div>
+  <div class="quiz-grid">`;
+  QUIZ_CHAPTERS.forEach(c=>{
+    const done=solvedTopics[c.topicId];
+    html+=`<div class="quiz-card ${done?'completed':''}"
+      onclick="startQuizChapter('${c.id}')"
+      style="${done?'border-color:var(--green)':''}"
+      onmouseover="this.style.borderColor='${c.color}'"
+      onmouseout="this.style.borderColor='${done?'var(--green)':'var(--border2)'}'">
+      <div class="qc-icon">${c.icon}</div>
+      <div class="qc-title">${c.title}</div>
+      <div class="qc-meta">
+        <span class="qc-count">${c.questions.length} soal</span>
+        ${done?'<span class="qc-done">✓ Selesai</span>':''}
+      </div>
+    </div>`;
+  });
+  html+=`</div>`;
+  document.getElementById('quiz-selector').innerHTML=html;
+}
+
+function startQuizChapter(chId){
+  quizSt={chId,qIdx:0,selected:null,checked:false,correct:0};
+  document.getElementById('quiz-selector').style.display='none';
+  document.getElementById('quiz-game').style.display='block';
+  document.getElementById('screen-quiz').scrollTop=0;
+  renderQuizQ();
+}
+
+function renderQuizQ(){
+  const ch=QUIZ_CHAPTERS.find(c=>c.id===quizSt.chId);
+  const q=ch.questions[quizSt.qIdx];
+  const total=ch.questions.length;
+  const pct=Math.round((quizSt.qIdx/total)*100);
+
+  document.getElementById('quiz-game').innerHTML=`
+    <button class="quiz-back" onclick="backToQuizSelect()">← Topik Lain</button>
+    <div class="quiz-prog-wrap">
+      <div class="quiz-prog-meta">
+        <span>Soal ${quizSt.qIdx+1} dari ${total}</span>
+        <span style="color:${ch.color}">${ch.icon} ${ch.title}</span>
+      </div>
+      <div class="quiz-prog-bar"><div class="quiz-prog-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="q-card">
+      <div class="q-meta">
+        <span class="q-type-tag">${q.type}</span>
+        <span class="q-num">Q${quizSt.qIdx+1}</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      ${q.code?`<div class="q-code"><code>${esc(q.code)}</code></div>`:''}
+      <div class="opts-grid ${q.opts.some(o=>o.length>25)?'solo':''}" id="opts-wrap">
+        ${q.opts.map((o,i)=>`
+          <button class="opt-btn" id="qopt-${i}" onclick="selectOpt(${i})">
+            <span class="opt-letter">${'ABCD'[i]}</span>
+            <span class="opt-txt">${esc(o)}</span>
+          </button>`).join('')}
+      </div>
+    </div>
+    <div id="q-feedback"></div>
+    <button class="cta-check" id="q-cta" disabled onclick="checkAns()">CEK JAWABAN ✓</button>
+  `;
+  document.getElementById('screen-quiz').scrollTop=0;
+}
+
+function selectOpt(i){
+  if(quizSt.checked) return;
+  quizSt.selected=i;
+  document.querySelectorAll('.opt-btn').forEach((b,idx)=>b.classList.toggle('selected',idx===i));
+  document.getElementById('q-cta').disabled=false;
+}
+
+function checkAns(){
+  if(quizSt.selected===null||quizSt.checked) return;
+  quizSt.checked=true;
+  const ch=QUIZ_CHAPTERS.find(c=>c.id===quizSt.chId);
+  const q=ch.questions[quizSt.qIdx];
+  const right=quizSt.selected===q.ans;
+
+  document.getElementById(`qopt-${q.ans}`).classList.add('correct');
+  if(!right) document.getElementById(`qopt-${quizSt.selected}`).classList.add('wrong');
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+
+  if(right){xp+=10;streak++;quizSt.correct++;updateStats();showXP('+10 XP ⚡');}
+  else{hp=Math.max(0,hp-1);streak=0;updateStats();}
+
+  const isLast=quizSt.qIdx>=ch.questions.length-1;
+  let b64='';
+  try{b64=btoa(unescape(encodeURIComponent(q.demoOut||'')));}catch(e){b64=btoa(q.demoOut||'');}
+
+  document.getElementById('q-feedback').innerHTML=`
+    <div class="fb-card ${right?'ok':'err'}">
+      <div class="fb-head">
+        <span class="fb-emoji">${right?'🎉':'💡'}</span>
+        <span class="fb-title">${right?'Benar!':'Belum tepat!'}</span>
+      </div>
+      <div class="fb-exp">${q.exp}</div>
+      <div class="mini-demo">
+        <div class="mini-demo-header">
+          <div style="display:flex;gap:4px">
+            <span style="width:7px;height:7px;border-radius:50%;background:#ff5f57;display:block"></span>
+            <span style="width:7px;height:7px;border-radius:50%;background:#febc2e;display:block"></span>
+            <span style="width:7px;height:7px;border-radius:50%;background:#28c840;display:block"></span>
+          </div>
+          <button class="mini-run-btn" id="mrun-${quizSt.qIdx}"
+            onclick="runMiniDemo('mout-${quizSt.qIdx}','${b64}',${q.isErr||false},this)">▶ Run</button>
+        </div>
+        <div class="mini-code">${esc(q.demo||'')}</div>
+        <div class="mini-output" id="mout-${quizSt.qIdx}">
+          <span class="out-label">Output</span>
+          <span style="color:var(--text3)">Klik ▶ Run...</span>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <span class="fb-link" onclick="goToMateri('${ch.topicId}')">📚 Lihat materi terkait →</span>
+      </div>
+    </div>
+  `;
+  const cta=document.getElementById('q-cta');
+  cta.className='cta-next';
+  cta.textContent=isLast?'SELESAI 🏆':'LANJUT →';
+  cta.onclick=nextQ;
+}
+
+function nextQ(){
+  quizSt.qIdx++;
+  quizSt.selected=null;
+  quizSt.checked=false;
+  const ch=QUIZ_CHAPTERS.find(c=>c.id===quizSt.chId);
+  if(quizSt.qIdx>=ch.questions.length){showComplete();}
+  else{renderQuizQ();}
+}
+
+function showComplete(){
+  const ch=QUIZ_CHAPTERS.find(c=>c.id===quizSt.chId);
+  const total=ch.questions.length;
+  const acc=Math.round(quizSt.correct/total*100);
+  solvedTopics[ch.topicId]=true;
+  buildSidebar();
+  buildQuizSelector();
+  if(acc>=70) spawnConfetti();
+  const chIdx=QUIZ_CHAPTERS.indexOf(ch);
+  document.getElementById('quiz-game').innerHTML=`
+    <div class="complete-wrap">
+      <span class="trophy-big">🏆</span>
+      <div class="comp-title">Selesai!</div>
+      <div class="comp-sub">${ch.icon} ${ch.title}</div>
+      <div class="comp-stats">
+        <div class="cs"><div class="cs-val" style="color:var(--gold)">${quizSt.correct*10}</div><div class="cs-lbl">XP Diraih</div></div>
+        <div class="cs"><div class="cs-val" style="color:var(--green)">${quizSt.correct}/${total}</div><div class="cs-lbl">Benar</div></div>
+        <div class="cs"><div class="cs-val" style="color:var(--accent)">${acc}%</div><div class="cs-lbl">Akurasi</div></div>
+      </div>
+      <div class="comp-actions">
+        <button class="comp-btn retry" onclick="startQuizChapter('${ch.id}')">🔄 Ulangi</button>
+        <button class="comp-btn back" onclick="backToQuizSelect()">← Topik Lain</button>
+        ${chIdx<QUIZ_CHAPTERS.length-1?`<button class="comp-btn nxt" onclick="startQuizChapter('${QUIZ_CHAPTERS[chIdx+1].id}')">Berikutnya →</button>`:''}
+      </div>
+    </div>
+  `;
+}
+
+function backToQuizSelect(){
+  document.getElementById('quiz-selector').style.display='block';
+  document.getElementById('quiz-game').style.display='none';
+  document.getElementById('screen-quiz').scrollTop=0;
+}
+
+function goToMateri(topicId){
+  switchTab('home');
+  loadMateri(topicId);
+}
+
+function runMiniDemo(outId,b64,isErr,btn){
+  const el=document.getElementById(outId);
+  let out='';
+  try{out=decodeURIComponent(escape(atob(b64)));}catch(e){out=atob(b64);}
+  btn.disabled=true; btn.textContent='⏳';
+  el.innerHTML=`<span class="out-label">Output</span><span class="cursor"></span>`;
+  let i=0;
+  setTimeout(()=>{
+    const iv=setInterval(()=>{
+      if(i<=out.length){
+        el.className=`mini-output${isErr?' is-err':''}`;
+        el.innerHTML=`<span class="out-label">Output</span>${esc(out.slice(0,i))}<span class="cursor"></span>`;
+        i++;
+      } else {
+        el.innerHTML=`<span class="out-label">Output</span>${esc(out)}`;
+        btn.textContent='▶ Run'; btn.disabled=false;
+        clearInterval(iv);
+      }
+    },28);
+  },350);
+}
+
+/* ============================================================
+   EDITOR
+============================================================ */
+function buildChallengesList(){
+  let html='';
+  let lastTopic='';
+  CHALLENGES.forEach(c=>{
+    const topicSection = c.diff === 'easy' ? 'Mudah' : c.diff === 'medium' ? 'Menengah' : 'Sulit';
+    if(topicSection !== lastTopic){
+      html += `<div class="ch-group-title">${topicSection}</div>`;
+      lastTopic = topicSection;
+    }
+    const done=edSt.solved[c.id];
+    html+=`<div class="challenge-item ${edSt.challengeId===c.id?'active':''}" id="chi-${c.id}" onclick="loadChallenge('${c.id}')">
+      <div class="ch-title">${c.title}${done?` <span class="ch-done-icon">✓</span>`:''}</div>
+      <div class="ch-meta">
+        <span class="ch-diff ${c.diff}">${c.diff}</span>
+        <span class="ch-topic">${c.topic}</span>
+      </div>
+    </div>`;
+  });
+  document.getElementById('challenges-list').innerHTML=html;
+}
+
+function loadChallenge(id){
+  edSt.challengeId=id;
+  edSt.unsaved=false;
+  document.getElementById('unsaved-dot').style.display='none';
+  const ch=CHALLENGES.find(c=>c.id===id);
+  if(!ch) return;
+  const savedCode=edSt.savedCode[id]||ch.starter;
+  document.getElementById('code-textarea').value=savedCode;
+  document.getElementById('editor-title').textContent=`${ch.title} — ${ch.topic}`;
+  resetOutputPanel();
+  updateLineNums();
+  buildChallengesList();
+  loadProblemPanel(ch);
+  document.getElementById('rp-analysis').innerHTML=`<div class="ai-idle"><span class="ai-idle-icon">🤖</span>Jalankan kode kamu — AI akan menganalisis error dan menjelaskan cara memperbaikinya.</div>`;
+  switchRpTab('problem', document.querySelectorAll('.rp-tab')[0]);
+}
+
+function loadProblemPanel(ch){
+  const badgeStyle=ch.diff==='easy'?'background:rgba(61,220,132,.15);color:var(--green)':ch.diff==='medium'?'background:rgba(255,150,64,.15);color:var(--orange)':'background:rgba(255,85,85,.15);color:var(--red)';
+  document.getElementById('rp-problem').innerHTML=`
+    <div class="problem-title">${ch.title}</div>
+    <span style="${badgeStyle};border-radius:5px;padding:2px 9px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;display:inline-block;margin-bottom:12px">${ch.diff} · ${ch.topic}</span>
+    <div class="problem-desc">${ch.desc.replace(/\n/g,'<br>')}</div>
+    <div class="pe-label">Expected Output:</div>
+    <div class="problem-example"><span style="color:var(--green)">${esc(ch.expected)}</span></div>
+    <div style="font-size:11.5px;color:var(--text3);margin-top:14px;line-height:1.7">
+      💡 Klik <strong style="color:var(--gold)">Petunjuk</strong> jika butuh bantuan.<br>
+      💾 <strong style="color:var(--accent)">Simpan</strong> untuk menyimpan progres kamu.<br>
+      🤖 Tab <strong style="color:var(--accent)">AI Analisis</strong> akan aktif setelah kamu run kode.
+    </div>
+  `;
+}
+
+function resetOutputPanel(){
+  document.getElementById('output-text').textContent='// Klik ▶ Jalankan untuk eksekusi kode';
+  document.getElementById('output-text').classList.remove('has-error');
+  document.getElementById('output-status').textContent='Idle';
+  document.getElementById('output-status').className='output-status idle';
+}
+
+function editorTabSwitch(tab, el){
+  document.querySelectorAll('.es-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(tab==='challenges'){
+    document.getElementById('challenges-list').style.display='block';
+  } else {
+    document.getElementById('challenges-list').style.display='none';
+    edSt.challengeId=null;
+    edSt.unsaved=false;
+    document.getElementById('unsaved-dot').style.display='none';
+    document.getElementById('code-textarea').value=`#include <iostream>\nusing namespace std;\n\nint main() {\n    // Tulis kode bebas di sini!\n    cout << "Halo dari Playground!";\n    return 0;\n}`;
+    document.getElementById('editor-title').textContent='Playground — Kode Bebas';
+    document.getElementById('rp-problem').innerHTML=`<div style="text-align:center;padding:28px 12px"><div style="font-size:34px;margin-bottom:10px">🛝</div><div style="font-size:14px;font-weight:700;margin-bottom:8px">Mode Playground</div><div style="font-size:12.5px;color:var(--text2)">Tulis kode C++ bebas dan lihat hasilnya langsung!</div></div>`;
+    document.getElementById('rp-analysis').innerHTML=`<div class="ai-idle"><span class="ai-idle-icon">🤖</span>Jalankan kode, AI akan menganalisis error jika ada.</div>`;
+    resetOutputPanel();
+    updateLineNums();
+  }
+}
+
+function switchRpTab(tab,el){
+  rpTab=tab;
+  document.querySelectorAll('.rp-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('rp-problem').style.display=(tab==='problem'?'block':'none');
+  document.getElementById('rp-analysis').style.display=(tab==='analysis'?'block':'none');
+}
+
+/* ============================================================
+   EDITOR — CODE SAVE
+============================================================ */
+function saveCode(){
+  if(!edSt.challengeId) return;
+  const code=document.getElementById('code-textarea').value;
+  edSt.savedCode[edSt.challengeId]=code;
+  edSt.unsaved=false;
+  document.getElementById('unsaved-dot').style.display='none';
+  // also try localStorage
+  try { localStorage.setItem('cc_code_'+edSt.challengeId, code); } catch(e){}
+  const st=document.getElementById('save-toast');
+  st.style.display='block';
+  setTimeout(()=>st.style.display='none',2000);
+}
+
+/* ============================================================
+   RUN CODE
+============================================================ */
+function runCode(){
+  const code=document.getElementById('code-textarea').value.trim();
+  if(!code){
+    document.getElementById('output-text').textContent='// Tulis kode terlebih dahulu!';
+    return;
+  }
+  const result=simulateCpp(code);
+  const outEl=document.getElementById('output-text');
+  const stEl=document.getElementById('output-status');
+  if(result.error){
+    outEl.textContent=result.errorMsg;
+    outEl.classList.add('has-error');
+    stEl.textContent='Error'; stEl.className='output-status err';
+    doAIAnalysis(code,result);
+    switchRpTab('analysis',document.querySelectorAll('.rp-tab')[1]);
+  } else {
+    outEl.textContent=result.output||'// (tidak ada output)';
+    outEl.classList.remove('has-error');
+    stEl.textContent='Sukses ✓'; stEl.className='output-status ok';
+    checkSolution(result.output);
+    showAISuccess(result.output);
+  }
+}
+
+/* ============================================================
+   C++ SIMULATOR ENGINE
+============================================================ */
+function simulateCpp(code){
+  try{
+    let c=code.replace(/\/\/[^\n]*/g,'').replace(/\/\*[\s\S]*?\*\//g,'');
+    if(!/using namespace std\s*;/.test(c)&&/using namespace std/.test(c)){
+      return{error:true,errorType:'syntax',errorMsg:`main.cpp:2:21: error: expected ';'\n  using namespace std\n                     ^`,hint:'Lupa titik koma (;) setelah "using namespace std".',fixCode:'using namespace std;',relatedTopics:['intro']};
+    }
+    if(!/int main\s*\(/.test(c)){
+      return{error:true,errorType:'linker',errorMsg:`/usr/bin/ld: error: undefined reference to 'main'`,hint:'Program C++ WAJIB memiliki fungsi main().',fixCode:'int main() {\n    // kode\n    return 0;\n}',relatedTopics:['intro']};
+    }
+    const inc=[];
+    (c.match(/#include\s*<([^>]+)>/g)||[]).forEach(m=>inc.push(m.match(/<([^>]+)>/)[1]));
+    if(/\bcout\b/.test(c)&&!inc.includes('iostream')){
+      return{error:true,errorType:'compile',errorMsg:`main.cpp: error: 'cout' was not declared in this scope\nNote: did you forget #include <iostream>?`,hint:'cout ada di library <iostream>. Tambahkan #include <iostream>.',fixCode:'#include <iostream>',relatedTopics:['intro']};
+    }
+    if(/\bvector\b/.test(c)&&!inc.includes('vector')){
+      return{error:true,errorType:'compile',errorMsg:`main.cpp: error: 'vector' was not declared\nNote: #include <vector> diperlukan`,hint:'vector ada di STL. Tambahkan #include <vector>.',fixCode:'#include <vector>',relatedTopics:['stl']};
+    }
+    if(/\bmap\b/.test(c)&&!inc.includes('map')){
+      return{error:true,errorType:'compile',errorMsg:`main.cpp: error: 'map' was not declared\nNote: #include <map> diperlukan`,hint:'map ada di STL. Tambahkan #include <map>.',fixCode:'#include <map>',relatedTopics:['stl']};
+    }
+    if(/\bsort\b/.test(c)&&!inc.includes('algorithm')){
+      return{error:true,errorType:'compile',errorMsg:`main.cpp: error: 'sort' was not declared\nNote: #include <algorithm> diperlukan`,hint:'sort() ada di #include <algorithm>.',fixCode:'#include <algorithm>',relatedTopics:['stl']};
+    }
+    if(/\bruntime_error\b|\binvalid_argument\b/.test(c)&&!inc.includes('stdexcept')){
+      return{error:true,errorType:'compile',errorMsg:`main.cpp: error: 'runtime_error' was not declared\nNote: #include <stdexcept> diperlukan`,hint:'runtime_error ada di #include <stdexcept>.',fixCode:'#include <stdexcept>',relatedTopics:['exceptions']};
+    }
+    const ifAssign=c.match(/if\s*\(\s*\w+\s*=[^=]/);
+    if(ifAssign){
+      return{error:true,errorType:'logic',errorMsg:`warning: assignment in condition\nif (x = 5) {  // BUG! seharusnya ==`,hint:'Kamu menggunakan = (assignment) di dalam if. Gunakan == untuk perbandingan.',fixCode:'if (x == 5) {',relatedTopics:['operators','conditions']};
+    }
+    const out=evalCppOutput(c);
+    return{error:false,output:out!==null?out:'// Program berjalan tanpa output'};
+  }catch(e){
+    return{error:true,errorType:'runtime',errorMsg:`runtime error: ${e.message}`,hint:'Terjadi error saat menjalankan kode.',fixCode:'',relatedTopics:['intro']};
+  }
+}
+
+function evalCppOutput(code){
+  let c=code.replace(/#include[^\n]*/g,'').replace(/using namespace[^\n]*/g,'').replace(/\/\/[^\n]*/g,'').replace(/\/\*[\s\S]*?\*\//g,'');
+  const mainM=c.match(/int\s+main\s*\([^)]*\)\s*\{([\s\S]*)\}/);
+  if(!mainM) return null;
+  let body=mainM[1];
+  const vars={};
+  for(const m of body.matchAll(/\b(int|double|float|bool|long)\s+(\w+)\s*=\s*([^;,\n]+)[;,]/g)){
+    try{
+      let val=m[3].trim();
+      if(m[1]==='bool') vars[m[2]]=(val==='true'||val==='1')?1:0;
+      else if(m[1]==='double'||m[1]==='float') vars[m[2]]=parseFloat(evalExpr(val,vars));
+      else vars[m[2]]=Math.trunc(parseFloat(evalExpr(val,vars)));
+    }catch(e){}
+  }
+  for(const m of body.matchAll(/\bstring\s+(\w+)\s*=\s*"([^"]*)"[;,]/g)) vars[m[1]]=m[2];
+  for(const m of body.matchAll(/\bconst\s+\w+\s+(\w+)\s*=\s*([^;]+);/g)){
+    try{vars[m[1]]=parseFloat(evalExpr(m[2].trim(),vars))||m[2].trim().replace(/"/g,'');}catch(e){}
+  }
+  return processCout(body,vars);
+}
+
+function processCout(body,vars){
+  let out='';
+  const lines=body.split('\n');
+  let i=0;
+  while(i<lines.length){
+    const line=lines[i].trim();
+    const forM=line.match(/^for\s*\(\s*(?:int|auto)\s+(\w+)\s*=\s*([^;]+);\s*(\w+)\s*([<>]=?|==|!=)\s*([^;]+);\s*(\w+)(\+\+|--|\+=\s*\d+|-=\s*\d+)\s*\)/);
+    if(forM){
+      const[,ivar,initE,,op,limE,incrV,incrOp]=forM;
+      const v={...vars};
+      v[ivar]=Math.trunc(parseFloat(evalExpr(initE.trim(),v)));
+      const lim=parseFloat(evalExpr(limE.trim(),v));
+      let body2='',depth=0,j=i;
+      while(j<lines.length){
+        depth+=lines[j].split('{').length-1-lines[j].split('}').length+1;
+        body2+=lines[j]+'\n'; j++;
+        if(j>i&&depth<=0) break;
+      }
+      const inner=(body2.match(/\{([\s\S]*)\}/)||['',''])[1];
+      let iter=0;
+      while(iter<300){
+        if(!evalCond(v[ivar],op,lim)) break;
+        const r=processCout(inner,{...v,[ivar]:v[ivar]});
+        if(r==='__BREAK__') break;
+        out+=r;
+        if(incrOp==='++') v[ivar]++;
+        else if(incrOp==='--') v[ivar]--;
+        else if(incrOp.startsWith('+=')) v[ivar]+=parseFloat(incrOp.slice(2));
+        else if(incrOp.startsWith('-=')) v[ivar]-=parseFloat(incrOp.slice(2));
+        iter++;
+      }
+      i=j; continue;
+    }
+    if(line.startsWith('if')){
+      const r=processIf(lines,i,vars);
+      out+=r.out; i=r.ni; continue;
+    }
+    if(line.startsWith('cout')) out+=evalCout(line,vars);
+    const re=line.match(/^(\w+)\s*=\s*([^;]+);/);
+    if(re&&vars.hasOwnProperty(re[1])){try{vars[re[1]]=parseFloat(evalExpr(re[2].trim(),vars));}catch(e){}}
+    const ce=line.match(/^(\w+)\s*(\+=|-=|\*=|\/=|%=)\s*([^;]+);/);
+    if(ce&&vars.hasOwnProperty(ce[1])){
+      try{const v=parseFloat(evalExpr(ce[3].trim(),vars));
+        if(ce[2]==='+=') vars[ce[1]]+=v; else if(ce[2]==='-=') vars[ce[1]]-=v;
+        else if(ce[2]==='*=') vars[ce[1]]*=v; else if(ce[2]==='/=') vars[ce[1]]/=v;
+        else if(ce[2]==='%=') vars[ce[1]]%=v;
+      }catch(e){}
+    }
+    i++;
+  }
+  return out;
+}
+
+function processIf(lines,startI,vars){
+  let out='',i=startI;
+  while(i<lines.length){
+    const line=lines[i].trim();
+    let condM=null;
+    if(line.startsWith('if')||line.includes('else if')) condM=line.match(/if\s*\(([^)]+)\)/);
+    const isElse=!condM&&(line.startsWith('}else')||line.startsWith('else'));
+    if(condM){
+      const cond=evalBool(condM[1].trim(),vars);
+      let b='',depth=0,j=i;
+      while(j<lines.length){
+        depth+=lines[j].split('{').length-1-lines[j].split('}').length+1;
+        b+=lines[j]+'\n'; j++;
+        if(j>i+1&&depth<=0) break;
+      }
+      const inn=(b.match(/\{([\s\S]*?)\}/)||['',''])[1];
+      if(cond){out=processCout(inn,{...vars});i=j;break;}
+      i=j-1;
+    } else if(isElse&&line.includes('{')){
+      let b='',depth=0,j=i;
+      while(j<lines.length){
+        depth+=lines[j].split('{').length-1-lines[j].split('}').length+1;
+        b+=lines[j]+'\n'; j++;
+        if(j>i+1&&depth<=0) break;
+      }
+      const inn=(b.match(/\{([\s\S]*?)\}/)||['',''])[1];
+      out=processCout(inn,{...vars}); i=j; break;
+    } else break;
+    i++;
+  }
+  return{out,ni:i};
+}
+
+function evalBool(expr,vars){
+  try{
+    let e=expr;
+    Object.keys(vars).forEach(k=>{e=e.replace(new RegExp('\\b'+k+'\\b','g'),vars[k]);});
+    e=e.replace(/true/g,'1').replace(/false/g,'0');
+    if(e.includes('&&')) return e.split('&&').every(p=>evalBool(p.trim(),{}));
+    if(e.includes('||')) return e.split('||').some(p=>evalBool(p.trim(),{}));
+    const m=e.match(/(.+?)\s*(==|!=|>=|<=|>|<)\s*(.+)/);
+    if(m) return evalCond(parseFloat(m[1]),m[2],parseFloat(m[3]));
+    return !!parseFloat(e);
+  }catch(e){return false;}
+}
+
+function evalCond(a,op,b){
+  if(op==='<') return a<b; if(op==='>') return a>b;
+  if(op==='<=') return a<=b; if(op==='>=') return a>=b;
+  if(op==='==') return a==b; if(op==='!=') return a!=b;
+  return false;
+}
+
+function evalExpr(expr,vars){
+  let e=expr.trim();
+  if(e.startsWith('"')&&e.endsWith('"')) return e.slice(1,-1);
+  if(e==='true') return 1; if(e==='false') return 0;
+  Object.keys(vars).forEach(k=>{e=e.replace(new RegExp('\\b'+k+'\\b','g'),vars[k]);});
+  try{return Function('"use strict"; return ('+e+')')();}catch(ex){return e;}
+}
+
+function evalCout(line,vars){
+  let out='';
+  const m=line.match(/cout\s*((?:<<[^;]+)+)/);
+  if(!m) return '';
+  const parts=m[1].match(/<<\s*([^<]+)/g)||[];
+  parts.forEach(p=>{
+    let val=p.replace(/^<<\s*/,'').trim();
+    if(val==='endl'||val==='"\\n"'||val==="'\\n'"){out+='\n';return;}
+    if(val.startsWith('"')&&val.endsWith('"')){out+=val.slice(1,-1).replace(/\\n/g,'\n').replace(/\\t/g,'\t');return;}
+    if(val.startsWith("'")&&val.endsWith("'")){out+=val[1];return;}
+    if(/^\d+(\.\d+)?$/.test(val)){out+=val;return;}
+    if(vars.hasOwnProperty(val)){
+      const v=vars[val];
+      out+=(typeof v==='number'?(Number.isInteger(v)?v:parseFloat(v.toFixed(10))):v); return;
+    }
+    try{
+      const r=evalExpr(val,vars);
+      out+=(typeof r==='number'?(Number.isInteger(r)?r:parseFloat(r.toFixed(10))):r);
+    }catch(e){out+=val;}
+  });
+  return out;
+}
+
+/* ============================================================
+   CHECK SOLUTION
+============================================================ */
+function checkSolution(output){
+  if(!edSt.challengeId) return;
+  const ch=CHALLENGES.find(c=>c.id===edSt.challengeId);
+  if(!ch) return;
+  if((output||'').trim()===ch.expected.trim()){
+    const wasAlreadySolved=edSt.solved[ch.id];
+    edSt.solved[ch.id]=true;
+    if(!wasAlreadySolved){ xp+=20; streak++; updateStats(); showXP('+20 XP 🎯'); spawnConfetti(); }
+    buildChallengesList();
+  }
+}
+
+function showAISuccess(output){
+  const ch=edSt.challengeId?CHALLENGES.find(c=>c.id===edSt.challengeId):null;
+  const isCorrect=ch&&(output||'').trim()===ch.expected.trim();
+  document.getElementById('rp-analysis').innerHTML=`
+    <div class="ai-success">
+      <span class="ai-success-icon">${isCorrect?'🎉':'✅'}</span>
+      <div class="ai-success-title">${isCorrect?'Tantangan Selesai!':'Kode Berjalan!'}</div>
+      <div class="ai-success-sub" style="margin-bottom:8px">
+        Output: <code style="background:var(--bg3);padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:11px">${esc((output||'(kosong)').slice(0,80))}</code>
+      </div>
+      ${!isCorrect&&ch?'<div style="color:var(--gold);font-size:12px;line-height:1.6">Output belum sesuai. Bandingkan dengan <strong>Expected Output</strong> di tab Soal.</div>':''}
+    </div>
+  `;
+}
+
+/* ============================================================
+   AI ERROR ANALYSIS
+============================================================ */
+function doAIAnalysis(code,result){
+  document.getElementById('rp-analysis').innerHTML=`
+    <div class="ai-loading">
+      <div class="ai-typing">
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+        <span>AI menganalisis error kamu...</span>
+      </div>
+    </div>
+  `;
+  setTimeout(()=>showAIResult(code,result), 900+Math.random()*700);
+}
+
+function showAIResult(code,result){
+  const ch=edSt.challengeId?CHALLENGES.find(c=>c.id===edSt.challengeId):null;
+  const topics=result.relatedTopics||ch?.relatedErrors||['intro'];
+  const typeLabel={syntax:'Syntax Error',compile:'Compile Error',linker:'Linker Error',runtime:'Runtime Error',logic:'Logic Error',warning:'Warning'};
+  const typeExp={
+    syntax:'Syntax error: penulisan kode tidak sesuai aturan C++. Biasanya lupa titik koma, kurung kurawal, atau tanda kutip.',
+    compile:'Compile error: compiler tidak bisa memahami kode. Paling sering karena library belum di-include.',
+    linker:'Linker error: fungsi main() tidak ada atau fungsi dideklarasi tapi tidak didefinisikan.',
+    runtime:'Runtime error saat program berjalan. Bisa karena pembagian nol, akses memori tidak valid, dll.',
+    logic:'Logic error: kode berjalan tapi hasilnya salah. Periksa operator perbandingan dan logika program.',
+    warning:'Warning: kode bisa dikompilasi tapi ada potensi masalah yang perlu diperhatikan.'
+  };
+  document.getElementById('rp-analysis').innerHTML=`
+    <div>
+      <div class="ai-error-card">
+        <div class="ai-error-title">❌ ${typeLabel[result.errorType]||'Error'}</div>
+        <div class="ai-error-msg">${esc(result.errorMsg)}</div>
+        <div class="ai-explain">${typeExp[result.errorType]||'Terjadi error pada kode kamu.'}</div>
+      </div>
+      ${result.hint?`<div class="ai-fix-card">
+        <div class="ai-fix-title">💡 Cara Memperbaiki</div>
+        <div class="ai-explain" style="margin-bottom:7px">${result.hint}</div>
+        ${result.fixCode?`<div class="ai-fix-code">${esc(result.fixCode)}</div>`:''}
+      </div>`:''}
+      <div class="ai-materi-link">
+        <div class="aml-title">📚 Materi Terkait</div>
+        <div class="aml-topics">
+          ${topics.map(tid=>{
+            const m=MATERI.find(x=>x.id===tid);
+            return m?`<span class="aml-chip" onclick="goToMateri('${tid}')">${m.icon} ${m.label}</span>`:'';
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   EDITOR CONTROLS
+============================================================ */
+function showHint(){
+  if(!edSt.challengeId){alert('Pilih tantangan dulu!');return;}
+  const ch=CHALLENGES.find(c=>c.id===edSt.challengeId);
+  document.getElementById('hint-overlay')&&document.getElementById('hint-overlay').remove();
+  const d=document.createElement('div');
+  d.id='hint-overlay';
+  d.innerHTML=`<div style="background:rgba(255,200,87,.07);border:1px solid rgba(255,200,87,.2);border-radius:9px;padding:12px 14px;margin-top:10px">
+    <div style="font-size:11px;font-weight:800;color:var(--gold);margin-bottom:5px">💡 PETUNJUK</div>
+    <div style="font-size:12.5px;color:var(--text2);line-height:1.7">${ch.hint}</div>
+  </div>`;
+  document.getElementById('rp-problem').appendChild(d);
+  switchRpTab('problem',document.querySelectorAll('.rp-tab')[0]);
+}
+
+function resetCode(){
+  if(!edSt.challengeId){
+    document.getElementById('code-textarea').value=`#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Halo dari Playground!";\n    return 0;\n}`;
+    updateLineNums(); return;
+  }
+  if(!confirm('Reset kode ke starter? Perubahan kamu akan hilang.')) return;
+  const ch=CHALLENGES.find(c=>c.id===edSt.challengeId);
+  document.getElementById('code-textarea').value=ch.starter;
+  edSt.savedCode[edSt.challengeId]=ch.starter;
+  edSt.unsaved=false;
+  document.getElementById('unsaved-dot').style.display='none';
+  resetOutputPanel(); updateLineNums();
+}
+
+function onCodeInput(){
+  updateLineNums();
+  if(edSt.challengeId){
+    edSt.unsaved=true;
+    document.getElementById('unsaved-dot').style.display='flex';
+  }
+}
+
+function updateLineNums(){
+  const ta=document.getElementById('code-textarea');
+  const ln=document.getElementById('line-nums');
+  const lines=ta.value.split('\n');
+  ln.innerHTML=lines.map((_,i)=>`<span>${i+1}</span>`).join('');
+}
+
+function handleEditorKey(e){
+  const ta=e.target;
+  if(e.key==='Tab'){
+    e.preventDefault();
+    const s=ta.selectionStart,end=ta.selectionEnd;
+    ta.value=ta.value.substring(0,s)+'    '+ta.value.substring(end);
+    ta.selectionStart=ta.selectionEnd=s+4;
+    updateLineNums();
+  }
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){
+    e.preventDefault(); saveCode();
+  }
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
+    e.preventDefault(); runCode();
+  }
+}
+
+/* ============================================================
+   STATS & UI HELPERS
+============================================================ */
+function updateStats(){
+  document.getElementById('h-xp').textContent=xp;
+  document.getElementById('h-streak').textContent=streak;
+  document.getElementById('h-hp').textContent=hp;
+}
+
+function showXP(msg='+10 XP ⚡'){
+  const t=document.getElementById('xp-toast');
+  t.textContent=msg;
+  t.style.display='block';
+  t.style.animation='none';
+  void t.offsetWidth;
+  t.style.animation='xpPop 1.6s forwards';
+  setTimeout(()=>t.style.display='none',1600);
+}
+
+function spawnConfetti(){
+  const wrap=document.getElementById('conf-wrap');
+  wrap.innerHTML='';
+  const cols=['#4af4c0','#ffc857','#3ddc84','#ff9640','#bf94ff','#ff5f5f','#5ba4ff','#fff'];
+  for(let i=0;i<65;i++){
+    const el=document.createElement('div');
+    el.className='conf-p';
+    el.style.left=Math.random()*100+'vw';
+    el.style.background=cols[Math.floor(Math.random()*cols.length)];
+    el.style.animationDuration=(1.3+Math.random()*2.2)+'s';
+    el.style.animationDelay=(Math.random()*.8)+'s';
+    const sz=5+Math.random()*9;
+    el.style.width=sz+'px'; el.style.height=sz+'px';
+    el.style.borderRadius=Math.random()>.5?'50%':'2px';
+    wrap.appendChild(el);
+    setTimeout(()=>el.remove(),3500);
+  }
+}
+
+function esc(s){
+  if(!s) return '';
+  return s.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ============================================================
+   KEYBOARD SHORTCUT INFO
+============================================================ */
+// Ctrl+S = save, Ctrl+Enter = run (handled in handleEditorKey)
+</script>
+</body>
+</html>
